@@ -1,0 +1,86 @@
+/*
+ * menu_pointers.c
+ *
+ *  Created on: 19 maj 2021
+ *      Author: Szymon Kajda
+ */
+
+#include "menu_pointers.h"
+#include "../menus.h"
+#include "../oled_lib/ssd1306.h"
+
+uint8_t menuArrowMoving=0;
+int8_t menuArrowAnimDir=1;
+uint8_t menuArrowStepCount=11;
+
+uint8_t menu_arrow_pos_y = 0;
+
+/* TRIGGERS POINTER ARROW ANIMATION & MOVES CURSOR */
+void moveArrowCursor(uint8_t dir){
+	if(!menuArrowMoving){
+		//appCursor+=dir;
+		menu_cursor_y += dir;
+		menuArrowAnimDir = dir;
+		menuArrowStepCount = 0;
+	}
+}
+
+void moveArrowCursorInv(uint8_t dir){
+	if(!menuArrowMoving){
+		//appCursor+=dir;
+		menu_cursor_y += dir;
+		menuArrowAnimDir = -dir;
+		menuArrowStepCount = 0;
+	}
+}
+
+
+/*	DRAWS MENU POINTER ARROW
+ *	menuArrowStepCount used as a trigger to start
+ *	(set to < distance ('0' recommended) -> starts drawing)
+ */
+void draw_menu_arrow(volatile uint8_t xPos, int8_t dir, uint8_t distance){
+	if(menuArrowStepCount<distance){
+		menuYPos+=dir;
+		ssd1306_drawBitmap_P( xPos, menuYPos, arrow_on_left, ARROW_BMP_WIDTH, ARROW_BMP_HEIGHT, 1, 0 );
+		menuArrowStepCount++;
+		menuArrowMoving=1;
+	}
+	else
+		menuArrowMoving=0;
+
+	if(menuYPos == 0){
+		menuArrowStepCount = 11;
+		ssd1306_drawBitmap_P( xPos, menuYPos, arrow_on_left, ARROW_BMP_WIDTH, ARROW_BMP_HEIGHT, 1, 0 );
+	}
+	if( menuYPos < 0 ){
+		switch(menuYPos){
+			case -ARROW_BMP_HEIGHT-1:
+				appCursor = 5;
+				menuYPos = 55;
+				menuArrowStepCount = distance;
+				break;
+			default:
+				ssd1306_drawBitmap_P( xPos, menuYPos+64, arrow_on_left, ARROW_BMP_WIDTH, ARROW_BMP_HEIGHT, 1, 0 );
+		}
+	}
+	else if ( menuYPos > 63-ARROW_BMP_HEIGHT ){ // 64
+		switch(menuYPos){
+			case 63-ARROW_BMP_HEIGHT+1:
+				menuArrowStepCount--;
+				break;
+			case 64:
+				appCursor = 0;
+				menuYPos = 0;
+				menuArrowStepCount = distance;
+				break;
+		}
+		ssd1306_drawBitmap_P( xPos, menuYPos-64, arrow_on_left, ARROW_BMP_WIDTH, ARROW_BMP_HEIGHT, 1, 0 );
+	}
+	/*
+	for( uint8_t i=0;i<11;i++ ){
+		menuYPos+=dir;
+		ssd1306_drawBitmap_P( xPos, menuYPos, arrow_on_left, ARROW_BMP_WIDTH, ARROW_BMP_HEIGHT, 1, 0 );
+		ssd1306_display();
+	}*/
+}

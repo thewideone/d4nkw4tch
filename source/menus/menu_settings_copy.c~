@@ -1,0 +1,54 @@
+/*
+ * menu_settings.c
+ *
+ *  Created on: Jun 21, 2021
+ *      Author: Szymon Kajda
+ */
+
+#include "menu_settings.h"
+#include "../menus.h"
+
+#include "../power_adc_wdt.h"
+
+void handleMenuSettings( uint8_t * bit_settings ){
+	ssd1306_drawBitmap_P(120, menuYPos, arrow_on_left, ARROW_BMP_WIDTH, ARROW_BMP_HEIGHT, 1, 0);
+	switch (button) {
+		case BOT:
+			//button = NONE;
+			moveArrowCursor(1);
+			break;
+		case TOP:
+			//button = NONE;
+			moveArrowCursor(-1);
+			break;
+		case PRESS:
+			//button = NONE;
+			/* GO TO SETTING */
+			switch (appCursor) {
+				case 0:
+					gotoMenuLoudness();
+					break;
+					/* INVERT DISPLAY */
+				case 1:
+					cli();
+					*bit_settings ^= (1 << INV_DISPLAY_BIT);
+					updateBitSettings(*bit_settings);
+					sei();
+					ssd1306_invertDisplay(!(*bit_settings & (1 << INV_DISPLAY_BIT)));
+					break;
+					/* POWER SAVING MODE */
+				case 2:
+					cli();
+					*bit_settings ^= (1 << PWR_SAVING_MODE_BIT);
+					updateBitSettings(*bit_settings);
+					sei();
+					handlePowerSettings(*bit_settings);
+					break;
+				case 4:
+					gotoMenuMain();
+					break;
+			}
+			break;
+	}
+	draw_menu_arrow(120, menuArrowAnimDir, 11);
+}
