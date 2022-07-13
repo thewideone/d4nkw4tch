@@ -6,6 +6,8 @@
  */
 
 #include "menus.h"
+#include "bitmaps/pictures.h"	// for astronauts
+#include "power_adc_wdt.h"	// for bit settings for astronauts
 
 volatile TMENU menu = menu_main;
 
@@ -30,6 +32,27 @@ void gotoMenu( TMENU new_menu ){
 		case menu_main:
 			DS3231_get_datetime( &datetime );
 			wakeUpTime = datetime.ss;
+
+			uint8_t bit_setts = readBitSettings();
+			if( bit_is_set( bit_setts, ASTRONAUT_MENU_BIT ) ){
+				ssd1306_drawBitmap_P( 0, 0, bmp_astronauts, BMP_ASTRONAUTS_W, BMP_ASTRONAUTS_H, 1, 0 );
+				ssd1306_puts( 25, 2, "Wait,it's", 1, 1, 0 );
+				ssd1306_puts( 68, 45, "Always has", 1, 1, 0 );
+				ssd1306_puts( 68, 53, "been...", 1, 1, 0 );
+				ssd1306_puts( 114, 31, "?", 1, 1, 0 );
+				ssd1306_drawFillRect( 88, 18, 2, 2, 1 );
+				ssd1306_drawFillRect( 88, 22, 2, 2, 1 );
+//				ssd1306_setPixel( 88, 18, 1 );
+//				ssd1306_setPixel( 88, 19, 1 );
+//				ssd1306_setPixel( 89, 18, 1 );
+//				ssd1306_setPixel( 89, 19, 1 );
+//
+//				ssd1306_setPixel( 88, 22, 1 );
+//				ssd1306_setPixel( 88, 23, 1 );
+//				ssd1306_setPixel( 89, 22, 1 );
+//				ssd1306_setPixel( 89, 23, 1 );
+
+			}
 			break;
 		case menu_apps:
 			ssd1306_puts( 7, 0, "Game", 1, 1, 0 );
@@ -46,6 +69,7 @@ void gotoMenu( TMENU new_menu ){
 			ssd1306_puts( 7, 11, "Sound settings", 1, 1, 0 );
 			ssd1306_puts( 7, 22, "Invert display", 1, 1, 0 );
 			ssd1306_puts( 7, 33, "Power-saving mode", 1, 1, 0 );
+			ssd1306_puts( 7, 44, "Astronaut menu", 1, 1, 0 );
 			ssd1306_puts( 2, 55, "Back", 1, 1, 0 );
 			break;
 		case menu_sound_settings:

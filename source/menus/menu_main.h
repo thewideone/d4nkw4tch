@@ -11,5 +11,6 @@
 #include "../DS3231_lib/date_time.h"
 
 void handleMenuMain( TDATETIME * dt, TTEMP * temp );
+void handleMenuMainAstronauts( TDATETIME * dt, TTEMP * temp );
 
 #endif /* _MENU_MAIN_H_ */

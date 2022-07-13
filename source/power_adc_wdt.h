@@ -38,6 +38,7 @@
 #define PWR_SAVING_MODE_BIT 0
 #define INV_DISPLAY_BIT 1
 #define BUTTON_SOUND_BIT 2	// 0 - beep, 1 - click
+#define ASTRONAUT_MENU_BIT 3
 
 // Functions:
 void readVcc( void );

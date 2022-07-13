@@ -53,8 +53,7 @@ extern volatile uint8_t wakeUpTime;
 //volatile uint16_t batt_lvl;
 //volatile uint8_t batt_lvl;
 
-// 0 - pwr saving mode; 1 - invert display
-uint8_t bit_settings;
+uint8_t bit_settings;	// description in power_adc_wdt.h
 
 //extern int8_t menuArrowAnimDir;
 //extern uint8_t menuArrowStepCount;
@@ -213,6 +212,7 @@ int main(){
 		//}while( temperature.cel <= 0 );
 		DS3231_get_datetime( &datetime );
 		//readSqwState();
+		gotoMenu( menu_main );
 		wakeUpTime = datetime.ss;
 
 		sei();
@@ -245,7 +245,12 @@ int main(){
 			switch(menu){
 /* MAIN MENU */	case menu_main:
 					getDateTime( &datetime );
-					handleMenuMain(&datetime, &temperature);
+					if( bit_is_clear( bit_settings, ASTRONAUT_MENU_BIT ) )
+						handleMenuMain(&datetime, &temperature);
+					else{
+						handleMenuMainAstronauts(&datetime, &temperature);
+					}
+
 					break;
 /* APP MENU */	case menu_apps:
 					handleMenuApps();
@@ -265,6 +270,9 @@ int main(){
 /* LOUDNESS */	case menu_sound_settings:
 					handleMenuSoundSettings();
 /*  MENU 	*/		break;
+				case menu_volume:
+					handleMenuVolume();
+					break;
 /* SET D&T */	case menu_set_date_and_time:
 					getDateTime( &datetime );
 					handleMenuSetDateTime();

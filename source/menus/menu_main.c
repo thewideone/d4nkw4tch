@@ -8,6 +8,7 @@
 #include "avr/io.h"
 #include "menu_main.h"
 #include "../bitmaps/power_bitmaps.h"
+#include "../bitmaps/pictures.h"
 #include "../DS3231_lib/date_time.h"
 #include "../oled_lib/ssd1306.h"
 #include "../power_adc_wdt.h"
@@ -25,6 +26,61 @@ void handleMenuMain( TDATETIME * dt, TTEMP * temp ){
 			gotoMenu( menu_apps );
 			//gotoMenuApps();
 			break;
+	}
+}
+
+void handleMenuMainAstronauts( TDATETIME * dt, TTEMP * temp ){
+	if( sqwStateChanged() ){
+		readVcc();
+		uint8_t batt_lvl = batteryLvl();
+//		ssd1306_put_int( 5, 46, batt_lvl, 1, 1, 0 );
+
+//		ssd1306_put_int( 30, 46, charging, 1, 1, 0 );
+
+		// Maybe move this VV to some ISR?
+		if (isCharging())
+			ssd1306_drawBitmap_P( 34, 57, chrg, CHRG_BMP_WIDTH, CHRG_BMP_HEIGHT, 1, 0 );
+		else
+			ssd1306_drawFillRect( 34, 57, CHRG_BMP_WIDTH, CHRG_BMP_HEIGHT, 0 );
+		if (batt_lvl>BATTERY_80)
+			ssd1306_drawBitmap_P( 27, 57, batt_4, BATT_BMP_WIDTH, BATT_BMP_HEIGHT, 1, 0 );
+		else if (batt_lvl>BATTERY_60)
+			ssd1306_drawBitmap_P( 27, 57, batt_3, BATT_BMP_WIDTH, BATT_BMP_HEIGHT, 1, 0 );
+		else if (batt_lvl>BATTERY_40)
+			ssd1306_drawBitmap_P( 27, 57, batt_2, BATT_BMP_WIDTH, BATT_BMP_HEIGHT, 1, 0 );
+		else if (batt_lvl>BATTERY_20)
+			ssd1306_drawBitmap_P( 27, 57, batt_1, BATT_BMP_WIDTH, BATT_BMP_HEIGHT, 1, 0 );
+		else // if (batt_lvl<21)
+			ssd1306_drawBitmap_P( 27, 57, batt_0, BATT_BMP_WIDTH, BATT_BMP_HEIGHT, 1, 0 );
+		if (isUSBPlugged())
+			ssd1306_drawBitmap_P( 27, 49, usb, USB_BMP_WIDTH, USB_BMP_HEIGHT, 1, 0 );
+		else
+			ssd1306_drawFillRect( 27, 49, USB_BMP_WIDTH, USB_BMP_HEIGHT, 0 );
+
+		ssd1306_puts( 80, 2, dt->date, 1, 1, 0 );
+//		ssd1306_puts( 16, 17, dt->time, 2, 1, 0 ); // x=16,y=17
+		ssd1306_drawChar( 66, 14, dt->time[0], 1, 0, 2 );
+		ssd1306_drawChar( 78, 14, dt->time[1], 1, 0, 2 );
+		ssd1306_drawChar( 93, 14, dt->time[3], 1, 0, 2 );
+		ssd1306_drawChar( 105, 14, dt->time[4], 1, 0, 2 );
+//		ssd1306_put_int( 66, 14, dt->hh, 2, 1, 0 );
+//		ssd1306_put_int( 92, 14, dt->mm, 2, 1, 0 );
+		ssd1306_drawChar( 116, 21, dt->time[6], 1, 0, 1 );
+		ssd1306_drawChar( 122, 21, dt->time[7], 1, 0, 1 );
+//		ssd1306_put_int( 116, 21, dt->ss, 1, 1, 0 );
+		ssd1306_puts( 66, 31, days[dt->dayofweek], 1, 1, 0 );
+		ssd1306_puts( 89, 31, temp->temperature, 1, 1, 0 );
+		ssd1306_puts( 102, 31, "*C", 1, 1, 0 );
+
+		ssd1306_drawFillRect( 88, 18, 2, 2, 1 );
+		ssd1306_drawFillRect( 88, 22, 2, 2, 1 );
+	}
+
+	switch( button ){
+			case PRESS:
+				gotoMenu( menu_apps );
+				//gotoMenuApps();
+				break;
 	}
 }
 

@@ -14,7 +14,7 @@ void DS3231_init( void ){
 	RTC_32KHZ_PORT |= (1<<RTC_32KHZ);	//
 	i2cSetBitrate();
 	uint8_t ctrl = (1<<6);// | (1<<3);//0;		// set BBSQW bit (6) in Control Register to enable square wave output, changed by Szymon Kajda
-											// set EN32kHz (3) bit to enable 32kHz output
+												// set EN32kHz (3) bit to enable 32kHz output
 	TWI_write_buf( DS3231_ADDR, 0x0E, 1, &ctrl );
 }
 
@@ -38,7 +38,7 @@ void DS3231_get_temp( TTEMP * temp ){
 	int_to_string(t,temp->cel,2);
 	temp->temperature[0] = t[0];
 	temp->temperature[1] = t[1];
-	temp->temperature[2] = 0;
+	temp->temperature[2] = 0;	// string terminator
 #endif
 }
 
@@ -63,6 +63,7 @@ void DS3231_get_datetime( TDATETIME * dt ){
 	int_to_string( s,dt->ss,2 );
 	dt->time[6] = s[0];
 	dt->time[7] = s[1];
+	dt->time[8] = 0;	// string terminator
 #endif
 #if DATE_AS_STRING == 1
 	int_to_string( s,dt->day,2 );
@@ -76,6 +77,7 @@ void DS3231_get_datetime( TDATETIME * dt ){
 	int_to_string( s,dt->year,2 );
 	dt->date[6] = s[0];
 	dt->date[7] = s[1];
+	dt->date[8] = 0;	// string terminator
 #endif
 }
 
