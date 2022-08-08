@@ -19,13 +19,18 @@ uint8_t display_nr;
 
 #if USE_SPI_OR_I2C == 1
 static void SPIwrite( uint8_t dat ){
-	uint8_t i;
-	for (i= 0x80;i;i >>= 1){
-		SCK_LO;
-		if (dat & i) MOSI_HI;
-		else MOSI_LO;
-		SCK_HI;
-	}
+
+//	while( bit_is_clear( SPSR, SPIF ) );
+	SPDR = dat;
+	while(!(SPSR & (1<<SPIF)));
+
+//	uint8_t i;
+//	for (i= 0x80;i;i >>= 1){
+//		SCK_LO;
+//		if (dat & i) MOSI_HI;
+//		else MOSI_LO;
+//		SCK_HI;
+//	}
 }
 
 void ssd1306_InitSpi( void ){
@@ -48,6 +53,12 @@ void ssd1306_InitSpi( void ){
 	CS2_DDR |= CS2;
 	CS2_PORT |= CS2;
 #endif
+
+	SPCR |= (1<<SPE)|	// enable SPI
+			(1<<MSTR)|	// set master mdoe
+			(1<<CPOL)|  // We dont want it to idle high
+			(1<<CPHA);
+	SPSR |= (1<<SPI2X);	// SPI double speed
 }
 #endif
 
