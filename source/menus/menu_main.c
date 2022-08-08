@@ -68,12 +68,14 @@ void handleMenuMainAstronauts( TDATETIME * dt, TTEMP * temp ){
 		ssd1306_drawChar( 116, 21, dt->time[6], 1, 0, 1 );
 		ssd1306_drawChar( 122, 21, dt->time[7], 1, 0, 1 );
 //		ssd1306_put_int( 116, 21, dt->ss, 1, 1, 0 );
+
 		ssd1306_puts( 66, 31, days[dt->dayofweek], 1, 1, 0 );
+		ssd1306_put_int( 66, 42, dt->dayofweek, 1, 1, 0 );
 		ssd1306_puts( 89, 31, temp->temperature, 1, 1, 0 );
 		ssd1306_puts( 102, 31, "*C", 1, 1, 0 );
 
-		ssd1306_drawFillRect( 88, 18, 2, 2, 1 );
-		ssd1306_drawFillRect( 88, 22, 2, 2, 1 );
+		ssd1306_drawFillRect( 89, 18, 2, 2, 1 );
+		ssd1306_drawFillRect( 89, 22, 2, 2, 1 );
 	}
 
 	switch( button ){

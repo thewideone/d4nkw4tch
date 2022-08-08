@@ -80,6 +80,7 @@ struct small_int appCursor = {.var = 0};
 */
 /*
 	TODO:
+	- dzien tygodnia wychodzi poza days[][] w poniedzialki
 	- po obudzeniu obraz jest wyświetlany dopiero przy zmianie stanu rtc int - poprawić
 	- watchdog wyłącza zegarek gdy się usypia i jest uspany!
 	- low power consumption using DIDR0 register https://www.avrfreaks.net/forum/tristate-input-what-use-them
@@ -88,9 +89,9 @@ struct small_int appCursor = {.var = 0};
 	- in menu_set_date_time arrow doesn't point directly on values
 	- X change menu_cursor_x's to appCursor etc (and change their name), all the menus have some common variables
 	- X auto power saving mode when Vcc low
-	- 68Ohm resistor for brighter led
 	- turn off BLE LED option: "AT+PIO11" - 1: unconnected: out low, connected: out high
 	- connect RGB led to 5V (3.5V<Vcc<5.3V)
+	- 68Ohm resistor for brighter led
 	- ((datetime.ss-wakeUpTime) < stayUpTime) in main loop not working when minute changes
 	- X poll RTC only if connected to RTC INT pin's state's changed
 	- zrobić efekt wyłączania starego TV przed wyłączeniem się ekranu + może trochę glitchu?, w Aseprite
@@ -111,7 +112,7 @@ struct small_int appCursor = {.var = 0};
 	-make game of life
 	- pong with changing player after bounce
 
-	- make a power wire with ampmeter
+	- make a power wire with ammeter
 	- the screen seems not to be broken even when it doesn't light up for a while
 	- capacitor / resistor values from the website (https://learn.adafruit.com/monochrome-oled-breakouts/downloads)
 	- schematic http://wiki.sunfounder.cc/index.php?title=OLED-SSD1306_Module
