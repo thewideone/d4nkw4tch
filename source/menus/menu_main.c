@@ -70,7 +70,8 @@ void handleMenuMainAstronauts( TDATETIME * dt, TTEMP * temp ){
 //		ssd1306_put_int( 116, 21, dt->ss, 1, 1, 0 );
 
 		ssd1306_puts( 66, 31, days[dt->dayofweek], 1, 1, 0 );
-		ssd1306_put_int( 66, 42, (int)(dt->dayofweek), 1, 1, 0 );
+//		ssd1306_put_int( 66, 42, (int)(dt->dayofweek), 1, 1, 0 );
+		ssd1306_put_int( 66, 42, dt->dayofweek, 1, 1, 0 );
 		ssd1306_puts( 89, 31, temp->temperature, 1, 1, 0 );
 		ssd1306_puts( 102, 31, "*C", 1, 1, 0 );
 
@@ -171,7 +172,8 @@ void show_time( TDATETIME * dt, TTEMP * temp ){
 	*/
 		ssd1306_puts( 16, 17, dt->time, 2, 1, 0 ); // x=16,y=17
 		ssd1306_puts( 55, 39, days[dt->dayofweek], 1, 1, 0 );
-		ssd1306_put_int( 35, 39, (int)(dt->dayofweek), 1, 1, 0 );
+//		ssd1306_put_int( 35, 39, (int)(dt->dayofweek), 1, 1, 0 );
+		ssd1306_put_int( 35, 39, dt->dayofweek, 1, 1, 0 );
 		ssd1306_puts( 104, 56, temp->temperature, 1, 1, 0 );
 		ssd1306_puts( 116, 56, "*C", 1, 1, 0 );
 	/*

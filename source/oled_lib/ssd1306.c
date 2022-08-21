@@ -22,7 +22,11 @@ static void SPIwrite( uint8_t dat ){
 
 //	while( bit_is_clear( SPSR, SPIF ) );
 	SPDR = dat;
-	while(!(SPSR & (1<<SPIF)));
+	while(!(SPSR & (1<<SPIF)));	// wait for the transfer to complete
+	// I was trying to firstly wait and then send data,
+	// but with no success, because this method fails
+	// during the first function call as the SPIF flag
+	// is cleared at startup (and maybe after waking up?)
 
 //	uint8_t i;
 //	for (i= 0x80;i;i >>= 1){
@@ -55,7 +59,7 @@ void ssd1306_InitSpi( void ){
 #endif
 
 	SPCR |= (1<<SPE)|	// enable SPI
-			(1<<MSTR)|	// set master mdoe
+			(1<<MSTR)|	// set master mode
 			(1<<CPOL)|  // We dont want it to idle high
 			(1<<CPHA);
 	SPSR |= (1<<SPI2X);	// SPI double speed

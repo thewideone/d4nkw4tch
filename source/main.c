@@ -80,6 +80,7 @@ struct small_int appCursor = {.var = 0};
 */
 /*
 	TODO:
+	- dodac wyswietlanie zera w tostring() w ssd1306_put_int()
 	- dzien tygodnia wychodzi poza days[][] w poniedzialki
 	- po obudzeniu obraz jest wyświetlany dopiero przy zmianie stanu rtc int - poprawić
 	- watchdog wyłącza zegarek gdy się usypia i jest uspany!
@@ -244,14 +245,15 @@ int main(){
 //				LED2_TOGGLE;
 
 			switch(menu){
+				default:
+					handleMenuDefault( &datetime, wakeUpTime, stayUpTime );
+					break;
 /* MAIN MENU */	case menu_main:
 					getDateTime( &datetime );
 					if( bit_is_clear( bit_settings, ASTRONAUT_MENU_BIT ) )
-						handleMenuMain(&datetime, &temperature);
-					else{
-						handleMenuMainAstronauts(&datetime, &temperature);
-					}
-
+						handleMenuMain( &datetime, &temperature );
+					else
+						handleMenuMainAstronauts( &datetime, &temperature );
 					break;
 /* APP MENU */	case menu_apps:
 					handleMenuApps();
