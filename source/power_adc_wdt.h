@@ -15,6 +15,8 @@
 #include "pin_desc.h"
 #include "DS3231_lib/date_time.h"
 
+typedef enum { SHUTDOWN_NO_BATT, CHARGING, COMPLETE_STANDBY } ChargerState;
+
 #define BATTERY_80 252
 #define BATTERY_60 242
 #define BATTERY_40 238

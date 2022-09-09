@@ -151,7 +151,9 @@ int main(){
 	/* INIT SECTION */
 	wdt_enable(WDTO_2S);
 	ssd1306_init( SSD1306_SWITCHCAPVCC, REFRESH_MAX );
-	DS3231_init();
+//	LED_ON;
+//	DS3231_init();
+//	LED2_ON;
 	uart_init(UBRRVAL);
 	// BT off on startup?
 
@@ -187,6 +189,7 @@ int main(){
 		sei();
 		sleep_cpu;
 		sleep_disable;
+
 		/* Wake up */
 		//wdt_enable(WDTO_4S);	// Enable Watchdog
 		ssd1306_init( SSD1306_SWITCHCAPVCC, REFRESH_MAX );
@@ -209,13 +212,34 @@ int main(){
 		// READ DATA FROM RTC
 		// while(temp <= 0):
 		//do{
+
+		// working till now
+
+		/// Temporarily added
+//		while( buttonState() == NONE ){
+			handleButtons( buttons_hold_mode );
+			if( buttonState() == TOP ){
+				bluetoothTurnOn();
+			}
+			else if( buttonState() == BOT ){
+				bluetoothTurnOff();
+				LED2_ON;
+			}
+//		}
+		LED_ON;
+		///
+
 		DS3231_get_temp( &temperature );
+
 		//	_delay_ms(2);
 		//}while( temperature.cel <= 0 );
 		DS3231_get_datetime( &datetime );
+		LED_ON;
 		//readSqwState();
 		gotoMenu( menu_main );
 		wakeUpTime = datetime.ss;
+
+
 
 		sei();
 
@@ -241,8 +265,8 @@ int main(){
 				buzzerEnable();
 			else buzzerDisable();
 
-//			if( sqwStateChanged() )
-//				LED2_TOGGLE;
+			if( sqwStateChanged() )
+				LED2_TOGGLE;
 
 			switch(menu){
 				default:

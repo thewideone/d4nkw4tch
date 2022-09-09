@@ -27,6 +27,7 @@
 #include "menus/menu_settings.h"
 #include "menus/menu_sound_settings.h"
 #include "menus/menu_apps.h"
+#include "menus/menu_default.h"
 
 typedef enum {menu_main, menu_apps, menu_settings, menu_sound_settings, menu_volume, menu_set_date_and_time, menu_flashlight, menu_bt, menu_bt_terminal} TMENU;
 

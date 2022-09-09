@@ -31,25 +31,29 @@ uint8_t battery_lvl;// = BATTERY_80;
  */
 void readVcc( void ) {
 	//uint8_t result;
+//	uint16_t result;
 
 	BATT_EN_PORT |= (1<<BATT_EN);	// Enable the voltage divider
 	//ADCSRA |= (1<<ADEN);			// Enable ADC
 	// Input is ADC7 with 1.1V as reference,
 	// setting ADLAR shifts ADC value to the left
 	// so reading just ADCH gives 8-bit value
-	//ADMUX = _BV(REFS1) | _BV(REFS0) | _BV(MUX2) | _BV(MUX1) | _BV(MUX0);
+//	ADMUX = _BV(REFS1) | _BV(REFS0) | _BV(MUX2) | _BV(MUX1) | _BV(MUX0);
 	ADMUX = _BV(ADLAR) | _BV(REFS1) | _BV(REFS0) | _BV(MUX2) | _BV(MUX1) | _BV(MUX0);
 	//ADMUX = _BV(REFS0) | _BV(MUX2) | _BV(MUX1) | _BV(MUX0);
 	_delay_ms(2);					// Wait for Vref to settle
 	ADCSRA |= (1<<ADEN);			// Enable ADC
 	ADCSRA |= _BV(ADSC);			// Convert
 	while (bit_is_set(ADCSRA,ADSC));// Wait for it wait for it wait for it
-	//result = ADCL;
-	//result |= ADCH<<8;
+//	result = ADCL;
+//	result |= ADCH<<8;
 	//while (! (ADCSRA & _BV(ADIF)) );	// We can test ADIF
 	//result = ADC;
 	//result = ADCH;
 	battery_lvl = ADCH;
+//	battery_lvl = ADCL;
+//	battery_lvl |= ADCH<<8;
+//	battery_lvl = (uint8_t)result/4;
 	//ADCSRA |= _BV( ADIF );			// but it has to be reset manually (unless we're handling an interrupt)
 
 	ADCSRA &= ~(1<<ADEN);			// Disable ADC
@@ -97,10 +101,8 @@ void updateBitSettings( uint8_t bitSettings ){
 
 /* Check if battery is charging */
 uint8_t isCharging( void ){
-	if( isUSBPlugged() ){
-		if( getChargerState() == 1 )
-			return 1;
-	}
+	if( isUSBPlugged() && (getChargerState() == CHARGING) )
+		return 1;
 	else
 		return 0;
 
@@ -113,22 +115,28 @@ uint8_t isUSBPlugged( void ){
 }
 
 uint8_t getChargerState( void ){
+	// Two separate results since the STAT pin
+	// of the charger IC is a tri-state output
+	// HI-Z - shutdown / no battery
+	// LOW  - preconditioning / charging
+	// HIGH - charge complete / standby
 	uint8_t result1 = 0, result2 = 0;
 
+	// Enable pull-up and test state
 	CHRG_STAT_PORT |= (1<<CHRG_STAT);
-
 	if(bit_is_set( CHRG_STAT_PIN, CHRG_STAT ))
 		result1 = 1;
 
+	// Disable pull-up and test state
 	CHRG_STAT_PORT &= ~(1<<CHRG_STAT);
 	if( bit_is_set( CHRG_STAT_PIN, CHRG_STAT ) )
 		result2 = 1;
 
-	if( (result1 == result2) == 1 )	// charge complete
-		return 0;
-	if( (result1 == result2) == 0 )	// preconditioning / charging
-		return 1;
-	if( result1 != result2 )		// shutdown
-		return 2;
+	if( result1 != result2 )	// shutdown / no battery
+		return SHUTDOWN_NO_BATT;
+	if( !result1 && !result2 )	// preconditioning / charging
+		return CHARGING;
+	if( result1 && result2 )	// charge complete
+		return COMPLETE_STANDBY;
 }
 
