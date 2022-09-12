@@ -20,7 +20,6 @@
 #include "oled_lib/ssd1306.h"
 #include "uart_lib/uart.h"
 
-//#include "ws2812b_lib/ws2812b.h"
 #include "led.h"
 #include "button_debounce/buttons.h"
 #include "buzzer.h"
@@ -30,39 +29,13 @@
 #include "anims/misc.h"
 #include "menus.h"
 
-//#define STAY_UP_CONDITIONS ( (datetime.ss-wakeUpTime) < stayUpTime || \
-//							bit_is_set( PCIFR,PCIF1 ) || \
-//							menu == menu_flashlight || \
-//							menu == menu_bt_teminal || \
-//							menu == menu_set_date_and_time)
-
-//extern int8_t menuArrowAnimDir;
-
-extern volatile button_t button;	// 1-BOT 2-CLICK 3-TOP
-extern uint8_t buttons_hold_mode;
-//extern volatile TBUZZER buzzer; // = ON;
-//volatile TBUZZER buzer_state;
 extern volatile TMENU menu;		// = menu_main;
 
 extern volatile uint8_t stayUpTime;// = STAY_UP_TIME;
 
 extern volatile uint8_t wakeUpTime;
-//extern volatile uint8_t charging;
-//volatile uint8_t charging;
-//extern volatile long batt_lvl;
-//volatile uint16_t batt_lvl;
-//volatile uint8_t batt_lvl;
 
 uint8_t bit_settings;	// description in power_adc_wdt.h
-
-//extern int8_t menuArrowAnimDir;
-//extern uint8_t menuArrowStepCount;
-//extern uint8_t menuArrowMoving;
-
-
-int displayTimeXPos=16;
-
-
 
 //char bt_buf[BT_BUF_LENGTH];
 //uint8_t bt_buf_index = 0;
@@ -91,11 +64,10 @@ struct small_int appCursor = {.var = 0};
 	- X change menu_cursor_x's to appCursor etc (and change their name), all the menus have some common variables
 	- X auto power saving mode when Vcc low
 	- turn off BLE LED option: "AT+PIO11" - 1: unconnected: out low, connected: out high
-	- connect RGB led to 5V (3.5V<Vcc<5.3V)
 	- 68Ohm resistor for brighter led
-	- ((datetime.ss-wakeUpTime) < stayUpTime) in main loop not working when minute changes
+	- X ((datetime.ss-wakeUpTime) < stayUpTime) in main loop not working when minute changes
 	- X poll RTC only if connected to RTC INT pin's state's changed
-	- zrobić efekt wyłączania starego TV przed wyłączeniem się ekranu + może trochę glitchu?, w Aseprite
+	- X zrobić efekt wyłączania starego TV przed wyłączeniem się ekranu + może trochę glitchu?, w Aseprite
 	- funkcja przenoszaca fragmenty obrazu (przenoszenie stralki w menu jest szybsze niz rysowanie od nowa
 											+ strzalka nie musi miec ramki z czarnych pixeli)
 	-code optimalization
@@ -113,6 +85,7 @@ struct small_int appCursor = {.var = 0};
 	-make game of life
 	- pong with changing player after bounce
 
+	Hardware debugging:
 	- make a power wire with ammeter
 	- the screen seems not to be broken even when it doesn't light up for a while
 	- capacitor / resistor values from the website (https://learn.adafruit.com/monochrome-oled-breakouts/downloads)
@@ -151,23 +124,19 @@ int main(){
 	/* INIT SECTION */
 	wdt_enable(WDTO_2S);
 	uart_init(UBRRVAL);	// BT off on startup?
-//	tx_string( "UART setup done.\r\n" );
 	ssd1306_init( SSD1306_SWITCHCAPVCC, REFRESH_MAX );
-//	tx_string( "Display setup done.\r\n" );
-//	LED_ON;
-//	DS3231_init();
-//	LED2_ON;
 
 	setupADC();
 	// I/O SETUP
+	setupBattAndPlugSense();
 	setupLED();
 	setupBuzzer();	// uses Timer0
 	setupButtons();	// uses Timer2
+
 	setButtonsHoldOff();
 
-	setupBattAndPlugSense();
-	//DDRD &= ~(1<<PD2);	// INT0 (RTC interrupt)
-	//PORTD |= (1<<PD2);	// INT0
+	RTC_INT_DDR &= ~(1<<RTC_INT);		//
+	RTC_INT_PORT |= (1<<RTC_INT);		// enable pull-up
 	// end of I/O SETUP
 
 	// INTERRUPTS SETUP
@@ -175,29 +144,19 @@ int main(){
 	PCMSK1 |= (1<<PCINT11) | (1<<PCINT10) | (1<<PCINT9);	// BUTTON
 	PCMSK2 |= (1<<PCINT20);//|(1<<PCINT19);	// BATT STAT
 
-	RTC_INT_DDR &= ~(1<<RTC_INT);		//
-	RTC_INT_PORT |= (1<<RTC_INT);		// enable pull-up
-
-//	tx_string( "IO setup done.\r\n" );
-
-	//stayUpTime = STAY_UP_TIME;
-
 	BQ32002_init();
 	BQ32002_disableOsc();
 	BQ32002_enableOsc();
-	BQ32002_setCalFreq( 1 );	// 1Hz output
-	BQ32002_enableFreqTest();
-//	tx_string( "RTC setup done.\r\n" );
+	BQ32002_setCalFreq( 1 );	// set 1Hz output
+	BQ32002_enableFreqTest();	// enable the output
 
 	sei();
 
 	while(1){
 		/*	Sleep	*/
-//		tx_string( "Going into sleep mode.\r\n" );
 		//tx_string("AT+SLEEP");
 		//BATT_EN_PORT &= ~(1<<BATT_EN);	// Disable the divider
 		ssd1306_cmd( SSD1306_DISPLAYOFF );
-		//LED_OFF;
 		//wdt_disable_mod();			// Disable Watchdog, so it won't reset MCU when it's asleep
 		power_down;
 		sleep_enable;
@@ -206,7 +165,6 @@ int main(){
 		sleep_disable;
 
 		/* Wake up */
-//		tx_string( "Waking up.\r\n" );
 		//wdt_enable(WDTO_4S);	// Enable Watchdog
 		ssd1306_init( SSD1306_SWITCHCAPVCC, REFRESH_MAX );
 		ssd1306_cmd( SSD1306_DISPLAYON );
@@ -216,88 +174,31 @@ int main(){
 		if( bit_is_set( bit_settings, BUTTON_SOUND_BIT ) )
 			OCR0B = BUTTON_CLICK_OCR0B_VALUE;
 		else
-			OCR0B = 250;	// put that into PROGMEM
-		//ssd1306_invertDisplay( !(bitSettings & (1<<invDisplayBit)) );
-		// Just for testing commented readVcc()
-		// To restore, uncomment readVcc() and remove "= BATTERY_80" from power_adc_wdt.c
+			OCR0B = 250;	// put this into PROGMEM
+
 		readVcc();
 		handlePowerSettings( bit_settings );
 
 		ssd1306_cls();
 		menu = menu_main;
-		// READ DATA FROM RTC
-		// while(temp <= 0):
-		//do{
-
-		// working till now
-
-		/// Temporarily added
-//		while( buttonState() == NONE ){
-//			handleButtons( buttons_hold_mode );
-//			if( buttonState() == TOP ){
-//				bluetoothTurnOn();
-//			}
-//			else if( buttonState() == BOT ){
-//				bluetoothTurnOff();
-//				LED2_ON;
-//			}
-//		}
-//		LED_ON;
-		///
-
-//		DS3231_get_temp( &temperature );
-
-		//	_delay_ms(2);
-		//}while( temperature.cel <= 0 );
-//		DS3231_get_datetime( &datetime );
-//		LED_ON;
-		//readSqwState();
 
 		BQ32002_getDateTime( &datetime );
 		gotoMenu( menu_main );
 		wakeUpTime = datetime.ss;
 
-		tx_string( "Time update done, going into the while loop.\r\n" );
-
-
 		sei();
 
 		/*	Main loop	*/
-//		while( (datetime.ss-wakeUpTime) < stayUpTime ){
-//		while( (datetime.ss-wakeUpTime) < stayUpTime || bit_is_set( PCIFR,PCIF1 ) ||
-//				menu == menu_flashlight || menu == menu_bt_terminal || menu == menu_set_date_and_time ||
-//				menu == menu_bt ){
-//		while( (datetime.ss-wakeUpTime) < stayUpTime || bit_is_set( PCIFR,PCIF1 ) ||
-//			   ( (menu == menu_flashlight || menu == menu_bt_terminal || menu == menu_set_date_and_time ||
-//				  menu == menu_bt || menu == menu_apps) && (datetime.ss-wakeUpTime) < stayUpTime*4) ){
 		while( abs(datetime.ss-wakeUpTime) < stayUpTime || bit_is_set( PCIFR,PCIF1 ) ||
 			   ( (menu != menu_main) && abs(datetime.ss-wakeUpTime) < stayUpTime*3 )    ){
-			wdt_reset();
-			//DS3231_get_datetime( &datetime );
-			getDateTime( &datetime );
-//			BQ32002_getDateTime( &datetime );
-//			tx_string( "Updated time: " );
-//			tx_string( datetime.time );
-//			tx_string( "\r\n" );
-			//getTemp( &temperature );
 
-			//buttonForceRelease();	// put into handleButtons()
+			wdt_reset();
+			getDateTime( &datetime );
 			handleButtons();
 
-			if( buzzerState() == ON && button )
+			if( buzzerState() == ON && getButtonState() != NONE )
 				buzzerEnable();
 			else buzzerDisable();
-
-//			tx_string( "Updated buttons and buzzer.\r\n" );
-
-			if( sqwStateChanged() )
-				LED2_TOGGLE;
-//			if( getButtonState() == TOP )
-//				LED_ON;
-//			else
-//				LED_OFF;
-
-//			tx_string( "Going into menu switch.\r\n" );
 
 			switch(menu){
 				default:
@@ -314,7 +215,7 @@ int main(){
 					handleMenuApps();
 					break;
 /* FLASHLIGHT */case menu_flashlight:
-					if( button == PRESS ){
+					if( getButtonState() == PRESS ){
 						LED_OFF;
 						LED2_OFF;
 						//ssd1306_invertDisplay(0);
@@ -353,48 +254,14 @@ int main(){
 	}
 }
 
-/*
-void debounce_button( void ){
-	uint8_t count = 0;
-	uint8_t button_state = 0;
-
-	if(button != button_state){
-		count++;
-		if(count>=4){
-			button_state = button;
-			if(button != NONE)
-				button = BOT; // 4 example bot
-			count = 0;
-		}
-	}
-	else count = 0;
-}
-*/
-
-/* BUTTONS INTERRUPT */ // <- really?? "debounce()" handled in TIMER2_OVF_vect
+// Interrupt vector for PORTC,
+// which includes buttons.
 ISR(PCINT1_vect){
 	wakeUpTime = datetime.ss;
-	/*
-	if (bit_is_clear(PINC,PC0)){		// BOTTOM
-		_delay_ms(40);
-		if (bit_is_clear(PINC,PC0))
-			button = BOT;
-	}
-	else if (bit_is_clear(PINC,PC1)){	// MIDDLE
-		_delay_ms(40);
-		if (bit_is_clear(PINC,PC1))
-			button = PRESS;
-	}
-	else if (bit_is_clear(PINC,PC2)){	// TOP
-		_delay_ms(40);
-		if (bit_is_clear(PINC,PC2))
-			button = TOP;
-	}
-	else button = NONE;
-	*/
 }
 
-/* CHARGER INTERRUPT */
+// Interrupt vector for PORTD,
+// which includes charger input
 ISR(PCINT2_vect){
 	wakeUpTime = datetime.ss;
 }

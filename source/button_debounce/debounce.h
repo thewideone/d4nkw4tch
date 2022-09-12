@@ -2,7 +2,7 @@
  * debounce.h
  *
  *  Created on: Aug 24, 2020
- *      Author: Peter Dannegger
+ *      Author of the original file: Peter Dannegger
  *      Modified by: Szymon Kajda
  */
 

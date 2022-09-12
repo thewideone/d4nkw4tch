@@ -37,6 +37,6 @@ uint8_t isButtonDown( uint8_t button_mask ){
 void debounceInit(void){
 	// Button pins as input
 	BUTTON_DDR &= ~(BUTTON_MASK);
-	// Enable pullup on buttons
+	// Enable pull-up on buttons
 	BUTTON_PORT |= BUTTON_MASK;
 }

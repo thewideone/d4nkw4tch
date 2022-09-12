@@ -17,31 +17,32 @@
 #define BUTTON2_MASK (1<<PC2)
 #define BUTTON3_MASK (1<<PC3)
 
+#define BATT_EN_DDR DDRC
+#define BATT_EN_PORT PORTC
+#define BATT_EN PC0
+
 #define BUZZER_DDR DDRD
 #define BUZZER_PORT PORTD
 #define BUZZER_PIN PD5
 
-#define LED_DDR DDRD
-#define LED_PORT PORTD
-#define LED_PIN PD6
-
-#define LED2_DDR DDRB
-#define LED2_PORT PORTB
-#define LED2_PIN PB7
-
-#define RTC_INT_DDR DDRD
-#define RTC_INT_PORT PORTD
-#define RTC_INT_PIN PIND
-#define RTC_INT PD2
-
+// Not used since replacement of DS3231 by BQ32002
 #define RTC_32KHZ_DDR DDRB
 #define RTC_32KHZ_PORT PORTB
 #define RTC_32KHZ_PIN PINB
 #define RTC_32KHZ PB6
 
-#define BATT_EN_DDR DDRC
-#define BATT_EN_PORT PORTC
-#define BATT_EN PC0
+#define LED2_DDR DDRB
+#define LED2_PORT PORTB
+#define LED2_PIN PB7
+
+#define LED_DDR DDRD
+#define LED_PORT PORTD
+#define LED_PIN PD6
+
+#define RTC_INT_DDR DDRD
+#define RTC_INT_PORT PORTD
+#define RTC_INT_PIN PIND
+#define RTC_INT PD2
 
 #define CHRG_MODE_DDR DDRD
 #define CHRG_MODE_PORT PORTD

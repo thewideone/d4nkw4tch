@@ -81,30 +81,16 @@ void handleMenuMainAstronauts( datetime_t * dt ){
 	}
 
 	switch( button ){
-			case PRESS:
-				gotoMenu( menu_apps );
-				//gotoMenuApps();
-				break;
+		case PRESS:
+			gotoMenu( menu_apps );
+			break;
 	}
 }
 
 /* DISPLAY DATE AND TIME */
 void show_time( datetime_t * dt ){
-//	TCCR0A &= ~(1 << COM0B1);
-//	for( uint8_t i=0; i<10; i++ ){
-//		ssd1306_drawFillRect( 5, 5, 5, 5, 1 );
-//		ssd1306_display();
-//		_delay_ms(1000);
-//		ssd1306_drawFillRect( 5, 5, 5, 5, 0 );
-//		ssd1306_display();
-//		_delay_ms(1000);
-//	}
 	// 3.69V -> 0.97-0.98V -> reading: 161-162
-	//
 
-	//uint8_t batt_lvl;
-	//batt_lvl = readVcc();
-	//ssd1306_put_int( 5, 46, batt_lvl, 1, 1, 0 );
 	if( sqwState() )
 		ssd1306_drawFillRect( 2, 2, 2, 2, 1 );
 	else
@@ -156,34 +142,18 @@ void show_time( datetime_t * dt ){
 		else
 			ssd1306_drawFillRect( 15, 55, USB_BMP_WIDTH, USB_BMP_HEIGHT, 0 );
 		ssd1306_puts( 40, 2, dt->date, 1, 1, 0 );
-		/*
-		if(displayTimeXPos<127){
-				displayTimeXPos+=menuArrowAnimDir;
-				switch(menuArrowAnimDir){
-					case -1:
-						ssd1306_drawFastHLine( displayTimeXPos-1, 16, 14, 0 );
-						break;
-					case 1:
-						ssd1306_drawFastHLine( displayTimeXPos+1, 16, 14, 0 );
-						break;
-				}
-				ssd1306_puts( displayTimeXPos, 17, dt->time, 2, 1, 0 ); // x=16,y=17
-				menuArrowStepCount++;
-		}
-	*/
+
 		ssd1306_puts( 16, 17, dt->time, 2, 1, 0 ); // x=16,y=17
 		ssd1306_puts( 55, 39, days[dt->dayofweek], 1, 1, 0 );
 //		ssd1306_put_int( 35, 39, (int)(dt->dayofweek), 1, 1, 0 );
 		ssd1306_put_int( 35, 39, dt->dayofweek, 1, 1, 0 );
-//		ssd1306_puts( 104, 56, temp->temperature, 1, 1, 0 );
-//		ssd1306_puts( 116, 56, "*C", 1, 1, 0 );
 	/*
 		if (gotMsg)
 			ssd1306_drawChar(98,56,'M',1,0,1);
 		else
 			ssd1306_drawChar(98,56,' ',1,0,1);
 	*/
-		//ssd1306_drawFastVLine(0,0,10,1);
+
 		// Binary clock:
 		for(uint8_t i=0;i<8;i++){
 			ssd1306_setPixel(i+10,7,(datetime.ss>>i)&1);
