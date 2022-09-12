@@ -8,13 +8,13 @@
 #ifndef _TIME_DATE_H_
 #define _TIME_DATE_H_
 
-#include "ds3231.h"
-#include "../pin_desc.h"
+#include "BQ32002_lib/bq32002.h"
+#include "pin_desc.h"
 
 extern char days[7][4];		// defined in "time_date.c", declared here
 
-extern TDATETIME datetime;	// defined in "time_date.c", declared here
-extern TTEMP temperature;	// defined in "time_date.c", declared here
+extern datetime_t datetime;	// defined in "time_date.c", declared here
+//extern TTEMP temperature;	// defined in "time_date.c", declared here
 
 #define STAY_UP_TIME 5 /* In seconds */
 extern volatile uint8_t stayUpTime;// = STAY_UP_TIME;
@@ -26,7 +26,7 @@ uint8_t sqwState( void );
 uint8_t sqwStateChanged( void );
 void updateSqwState( void );		// handled at the end of "main.c"
 //void readSqwState( void );
-void getDateTime( TDATETIME * dt );
-void getTemp( TTEMP * temp );
+void getDateTime( datetime_t * dt );
+//void getTemp( TTEMP * temp );
 
 #endif /* _TIME_DATE_H_ */

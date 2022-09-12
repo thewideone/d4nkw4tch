@@ -6,7 +6,7 @@
  */
 
 #include "bluetooth.h"
-#include "../DS3231_lib/date_time.h"
+#include "../date_time.h"
 #include "../button_debounce/buttons.h"
 #include "../led.h"
 #include "../pin_desc.h"

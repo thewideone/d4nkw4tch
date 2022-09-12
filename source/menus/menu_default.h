@@ -8,9 +8,9 @@
 #ifndef SOURCE_MENUS_MENU_DEFAULT_H_
 #define SOURCE_MENUS_MENU_DEFAULT_H_
 
-#include "../DS3231_lib/date_time.h"
+#include "../date_time.h"
 #include "../menus.h"
 
-void handleMenuDefault( TDATETIME * dt, uint8_t wake_up_time, uint8_t stayUpTime );
+void handleMenuDefault( datetime_t * dt, uint8_t wake_up_time, uint8_t stayUpTime );
 
 #endif /* SOURCE_MENUS_MENU_DEFAULT_H_ */

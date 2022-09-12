@@ -7,10 +7,10 @@
 
 #include "date_time.h"
 
-#include "../pin_desc.h"
+#include "pin_desc.h"
 
-TDATETIME datetime;
-TTEMP temperature;
+datetime_t datetime;
+//TTEMP temperature;
 
 char days[7][4] = { //[7][4]
 		"Mon","Tue","Wed","Thu","Fri","Sat","Sun"
@@ -35,18 +35,18 @@ void updateSqwState( void ){
 	last_sqw_state = sqw_state;
 }
 
-void getDateTime( TDATETIME * dt ){
+void getDateTime( datetime_t * dt ){
 	if( sqwStateChanged() )
-		DS3231_get_datetime( dt );
+		BQ32002_getDateTime( dt );
 }
 
-void getTemp( TTEMP * temp ){
-	uint8_t sqw_state = bit_is_set( RTC_INT_PIN, RTC_INT ) ? 1 : 0;
-	if( sqw_state != last_sqw_state ){
-		DS3231_get_temp( temp );
-		last_sqw_state = sqw_state;
-	}
-}
+//void getTemp( TTEMP * temp ){
+//	uint8_t sqw_state = bit_is_set( RTC_INT_PIN, RTC_INT ) ? 1 : 0;
+//	if( sqw_state != last_sqw_state ){
+//		DS3231_get_temp( temp );
+//		last_sqw_state = sqw_state;
+//	}
+//}
 
 /*
 void readSqwState( void ){

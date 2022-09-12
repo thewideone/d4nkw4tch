@@ -11,8 +11,8 @@
 
 #include "button_debounce/buttons.h"
 #include "oled_lib/ssd1306.h"
-#include "DS3231_lib/ds3231.h"
-#include "DS3231_lib/date_time.h"
+//#include "DS3231_lib/ds3231.h"
+#include "date_time.h"
 #include "bluetooth/bluetooth.h"
 #include "led.h"
 
@@ -28,6 +28,7 @@
 #include "menus/menu_sound_settings.h"
 #include "menus/menu_apps.h"
 #include "menus/menu_default.h"
+#include "menus/menu_volume.h"
 
 typedef enum {menu_main, menu_apps, menu_settings, menu_sound_settings, menu_volume, menu_set_date_and_time, menu_flashlight, menu_bt, menu_bt_terminal} TMENU;
 

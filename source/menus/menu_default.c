@@ -10,7 +10,7 @@
 #include "menu_default.h"
 #include "../button_debounce/buttons.h"
 
-void handleMenuDefault( TDATETIME * dt, uint8_t wake_up_time, uint8_t stay_up_time ){
+void handleMenuDefault( datetime_t * dt, uint8_t wake_up_time, uint8_t stay_up_time ){
 	ssd1306_puts( 25, 14, "You shouldn't", 1, 1, 0 );
 	ssd1306_puts( 43, 23, "be here", 1, 1, 0 );
 	ssd1306_puts( 25, 34, "Entering main", 1, 1, 0 );

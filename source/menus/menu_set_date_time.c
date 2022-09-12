@@ -99,7 +99,7 @@ void handleMenuSetDateTime( void ){
 					break;
 				case 2:
 					menu_cursor_x = 0;
-					DS3231_set_date(temp_year, temp_month, temp_day, temp_day_of_week);
+					BQ32002_setDate(temp_year, temp_month, temp_day, temp_day_of_week);
 					break;
 			}
 			break;
@@ -148,7 +148,7 @@ void handleMenuSetDateTime( void ){
 					break;
 				case 4:
 					menu_cursor_x = 0;
-					DS3231_set_date(temp_year, temp_month, temp_day, temp_day_of_week);
+					BQ32002_setDate(temp_year, temp_month, temp_day, temp_day_of_week);
 					break;
 			}
 			break;
@@ -201,7 +201,7 @@ void handleMenuSetDateTime( void ){
 					break;
 				case 4:
 					menu_cursor_x = 0;
-					DS3231_set_time(temp_hh, temp_mm, temp_ss);
+					BQ32002_setTime(temp_hh, temp_mm, temp_ss);
 					break;
 			}
 			break;

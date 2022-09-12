@@ -9,7 +9,7 @@
 #include "menu_main.h"
 #include "../bitmaps/power_bitmaps.h"
 #include "../bitmaps/pictures.h"
-#include "../DS3231_lib/date_time.h"
+#include "../date_time.h"
 #include "../oled_lib/ssd1306.h"
 #include "../power_adc_wdt.h"
 #include "../math.h"
@@ -19,8 +19,8 @@
 #include "../menus.h"
 
 
-void handleMenuMain( TDATETIME * dt, TTEMP * temp ){
-	show_time( dt, temp );
+void handleMenuMain( datetime_t * dt ){
+	show_time( dt );
 	switch( button ){
 		case PRESS:
 			gotoMenu( menu_apps );
@@ -29,7 +29,7 @@ void handleMenuMain( TDATETIME * dt, TTEMP * temp ){
 	}
 }
 
-void handleMenuMainAstronauts( TDATETIME * dt, TTEMP * temp ){
+void handleMenuMainAstronauts( datetime_t * dt ){
 	if( sqwStateChanged() ){
 		readVcc();
 		uint8_t batt_lvl = batteryLvl();
@@ -72,11 +72,11 @@ void handleMenuMainAstronauts( TDATETIME * dt, TTEMP * temp ){
 		ssd1306_puts( 66, 31, days[dt->dayofweek], 1, 1, 0 );
 //		ssd1306_put_int( 66, 42, (int)(dt->dayofweek), 1, 1, 0 );
 		ssd1306_put_int( 66, 42, dt->dayofweek, 1, 1, 0 );
-		ssd1306_puts( 89, 31, temp->temperature, 1, 1, 0 );
+//		ssd1306_puts( 89, 31, temp->temperature, 1, 1, 0 );
 		ssd1306_puts( 102, 31, "*C", 1, 1, 0 );
 
-		ssd1306_drawFillRect( 89, 18, 2, 2, 1 );
-		ssd1306_drawFillRect( 89, 22, 2, 2, 1 );
+//		ssd1306_drawFillRect( 89, 18, 2, 2, 1 );
+//		ssd1306_drawFillRect( 89, 22, 2, 2, 1 );
 	}
 
 	switch( button ){
@@ -88,7 +88,7 @@ void handleMenuMainAstronauts( TDATETIME * dt, TTEMP * temp ){
 }
 
 /* DISPLAY DATE AND TIME */
-void show_time( TDATETIME * dt, TTEMP * temp ){
+void show_time( datetime_t * dt ){
 //	TCCR0A &= ~(1 << COM0B1);
 //	for( uint8_t i=0; i<10; i++ ){
 //		ssd1306_drawFillRect( 5, 5, 5, 5, 1 );
@@ -174,8 +174,8 @@ void show_time( TDATETIME * dt, TTEMP * temp ){
 		ssd1306_puts( 55, 39, days[dt->dayofweek], 1, 1, 0 );
 //		ssd1306_put_int( 35, 39, (int)(dt->dayofweek), 1, 1, 0 );
 		ssd1306_put_int( 35, 39, dt->dayofweek, 1, 1, 0 );
-		ssd1306_puts( 104, 56, temp->temperature, 1, 1, 0 );
-		ssd1306_puts( 116, 56, "*C", 1, 1, 0 );
+//		ssd1306_puts( 104, 56, temp->temperature, 1, 1, 0 );
+//		ssd1306_puts( 116, 56, "*C", 1, 1, 0 );
 	/*
 		if (gotMsg)
 			ssd1306_drawChar(98,56,'M',1,0,1);

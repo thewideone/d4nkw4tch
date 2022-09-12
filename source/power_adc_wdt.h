@@ -13,7 +13,7 @@
 #include <avr/wdt.h>
 
 #include "pin_desc.h"
-#include "DS3231_lib/date_time.h"
+#include "date_time.h"
 
 typedef enum { SHUTDOWN_NO_BATT, CHARGING, COMPLETE_STANDBY } ChargerState;
 

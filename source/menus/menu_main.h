@@ -8,9 +8,9 @@
 #ifndef _MENU_MAIN_H_
 #define _MENU_MAIN_H_
 
-#include "../DS3231_lib/date_time.h"
+#include "../date_time.h"
 
-void handleMenuMain( TDATETIME * dt, TTEMP * temp );
-void handleMenuMainAstronauts( TDATETIME * dt, TTEMP * temp );
+void handleMenuMain( datetime_t * dt );
+void handleMenuMainAstronauts( datetime_t * dt );
 
 #endif /* _MENU_MAIN_H_ */

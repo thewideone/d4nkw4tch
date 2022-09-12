@@ -15,7 +15,7 @@
 
 #include "bitmaps/power_bitmaps.h"
 #include "button_debounce/debounce.h"
-#include "DS3231_lib/ds3231.h"
+#include "BQ32002_lib/bq32002.h"
 #include "I2C_TWI/i2c_twi.h"
 #include "oled_lib/ssd1306.h"
 #include "uart_lib/uart.h"
@@ -24,7 +24,7 @@
 #include "led.h"
 #include "button_debounce/buttons.h"
 #include "buzzer.h"
-#include "DS3231_lib/date_time.h"
+#include "date_time.h"
 #include "power_adc_wdt.h"
 #include "anims/menu_pointers.h"
 #include "anims/misc.h"
@@ -150,12 +150,13 @@ int main(){
 
 	/* INIT SECTION */
 	wdt_enable(WDTO_2S);
+	uart_init(UBRRVAL);	// BT off on startup?
+//	tx_string( "UART setup done.\r\n" );
 	ssd1306_init( SSD1306_SWITCHCAPVCC, REFRESH_MAX );
+//	tx_string( "Display setup done.\r\n" );
 //	LED_ON;
 //	DS3231_init();
 //	LED2_ON;
-	uart_init(UBRRVAL);
-	// BT off on startup?
 
 	setupADC();
 	// I/O SETUP
@@ -173,12 +174,25 @@ int main(){
 	PCMSK1 |= (1<<PCINT11) | (1<<PCINT10) | (1<<PCINT9);	// BUTTON
 	PCMSK2 |= (1<<PCINT20);//|(1<<PCINT19);	// BATT STAT
 
+	RTC_INT_DDR &= ~(1<<RTC_INT);		//
+	RTC_INT_PORT |= (1<<RTC_INT);		// enable pull-up
+
+//	tx_string( "IO setup done.\r\n" );
+
 	//stayUpTime = STAY_UP_TIME;
+
+	BQ32002_init();
+	BQ32002_disableOsc();
+	BQ32002_enableOsc();
+	BQ32002_setCalFreq( 1 );	// 1Hz output
+	BQ32002_enableFreqTest();
+//	tx_string( "RTC setup done.\r\n" );
 
 	sei();
 
 	while(1){
 		/*	Sleep	*/
+//		tx_string( "Going into sleep mode.\r\n" );
 		//tx_string("AT+SLEEP");
 		//BATT_EN_PORT &= ~(1<<BATT_EN);	// Disable the divider
 		ssd1306_cmd( SSD1306_DISPLAYOFF );
@@ -191,6 +205,7 @@ int main(){
 		sleep_disable;
 
 		/* Wake up */
+//		tx_string( "Waking up.\r\n" );
 		//wdt_enable(WDTO_4S);	// Enable Watchdog
 		ssd1306_init( SSD1306_SWITCHCAPVCC, REFRESH_MAX );
 		ssd1306_cmd( SSD1306_DISPLAYON );
@@ -217,28 +232,31 @@ int main(){
 
 		/// Temporarily added
 //		while( buttonState() == NONE ){
-			handleButtons( buttons_hold_mode );
-			if( buttonState() == TOP ){
-				bluetoothTurnOn();
-			}
-			else if( buttonState() == BOT ){
-				bluetoothTurnOff();
-				LED2_ON;
-			}
+//			handleButtons( buttons_hold_mode );
+//			if( buttonState() == TOP ){
+//				bluetoothTurnOn();
+//			}
+//			else if( buttonState() == BOT ){
+//				bluetoothTurnOff();
+//				LED2_ON;
+//			}
 //		}
-		LED_ON;
+//		LED_ON;
 		///
 
-		DS3231_get_temp( &temperature );
+//		DS3231_get_temp( &temperature );
 
 		//	_delay_ms(2);
 		//}while( temperature.cel <= 0 );
-		DS3231_get_datetime( &datetime );
-		LED_ON;
+//		DS3231_get_datetime( &datetime );
+//		LED_ON;
 		//readSqwState();
+
+		BQ32002_getDateTime( &datetime );
 		gotoMenu( menu_main );
 		wakeUpTime = datetime.ss;
 
+		tx_string( "Time update done, going into the while loop.\r\n" );
 
 
 		sei();
@@ -256,6 +274,10 @@ int main(){
 			wdt_reset();
 			//DS3231_get_datetime( &datetime );
 			getDateTime( &datetime );
+//			BQ32002_getDateTime( &datetime );
+//			tx_string( "Updated time: " );
+//			tx_string( datetime.time );
+//			tx_string( "\r\n" );
 			//getTemp( &temperature );
 
 			//buttonForceRelease();	// put into handleButtons()
@@ -265,19 +287,23 @@ int main(){
 				buzzerEnable();
 			else buzzerDisable();
 
+//			tx_string( "Updated buttons and buzzer.\r\n" );
+
 			if( sqwStateChanged() )
 				LED2_TOGGLE;
+
+//			tx_string( "Going into menu switch.\r\n" );
 
 			switch(menu){
 				default:
 					handleMenuDefault( &datetime, wakeUpTime, stayUpTime );
 					break;
 /* MAIN MENU */	case menu_main:
-					getDateTime( &datetime );
+//					getDateTime( &datetime );
 					if( bit_is_clear( bit_settings, ASTRONAUT_MENU_BIT ) )
-						handleMenuMain( &datetime, &temperature );
+						handleMenuMain( &datetime );
 					else
-						handleMenuMainAstronauts( &datetime, &temperature );
+						handleMenuMainAstronauts( &datetime );
 					break;
 /* APP MENU */	case menu_apps:
 					handleMenuApps();
