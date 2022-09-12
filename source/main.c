@@ -38,7 +38,7 @@
 
 //extern int8_t menuArrowAnimDir;
 
-extern volatile TBUTTON button;	// 1-BOT 2-CLICK 3-TOP
+extern volatile button_t button;	// 1-BOT 2-CLICK 3-TOP
 extern uint8_t buttons_hold_mode;
 //extern volatile TBUZZER buzzer; // = ON;
 //volatile TBUZZER buzer_state;
@@ -163,6 +163,7 @@ int main(){
 	setupLED();
 	setupBuzzer();	// uses Timer0
 	setupButtons();	// uses Timer2
+	setButtonsHoldOff();
 
 	setupBattAndPlugSense();
 	//DDRD &= ~(1<<PD2);	// INT0 (RTC interrupt)
@@ -281,7 +282,7 @@ int main(){
 			//getTemp( &temperature );
 
 			//buttonForceRelease();	// put into handleButtons()
-			handleButtons( buttons_hold_mode );
+			handleButtons();
 
 			if( buzzerState() == ON && button )
 				buzzerEnable();
@@ -291,6 +292,10 @@ int main(){
 
 			if( sqwStateChanged() )
 				LED2_TOGGLE;
+//			if( getButtonState() == TOP )
+//				LED_ON;
+//			else
+//				LED_OFF;
 
 //			tx_string( "Going into menu switch.\r\n" );
 

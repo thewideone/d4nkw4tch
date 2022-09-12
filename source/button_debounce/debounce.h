@@ -2,11 +2,12 @@
  * debounce.h
  *
  *  Created on: Aug 24, 2020
- *      Author: Peter Dannegger? (not quite Szymon Kajda)
+ *      Author: Peter Dannegger
+ *      Modified by: Szymon Kajda
  */
 
 /*
-debounce.h. Snigelens version of Peter Dannegger�s debounce routines.
+debounce.h. Modified version of Peter Dannegger�s debounce routines.
 Debounce up to eight buttons on one port. $Rev: 577 $
 */
 #ifndef DEBOUNCE_H
@@ -16,22 +17,26 @@ Debounce up to eight buttons on one port. $Rev: 577 $
 #include <avr/interrupt.h>
 #include <util/atomic.h>
 
-#include "../pin_desc.h"	// added by Szymon Kajda
+#include "../pin_desc.h"
 
-// Buttons' masks in "pin_desc.h"
+// Buttons' masks' definitions in "pin_desc.h"
 #define BUTTON_MASK (BUTTON1_MASK | BUTTON2_MASK | BUTTON3_MASK)
 
-// Variable to tell that the button is pressed (and debounced).
-// Can be read with button_down() which will clear it.
+// Variables to tell that the buttons are pressed (and debounced).
+// buttons_down returns non-zero if a change has been detected.
+// buttons_down_state returns non-zero as long as a button is pressed.
+// Having two variables allows for triggering one-shot actions.
+// buttons_down can be read with isButtonJustPressed() which will clear it.
+// buttons_down_state can be read with isButtonDown() which will clear it.
 extern volatile uint8_t buttons_down;
+extern volatile uint8_t buttons_down_state;
 
 // Return non-zero if a button matching mask is pressed.
-uint8_t button_down(uint8_t button_mask);
-
-static uint8_t button_state = 0;
+uint8_t isButtonJustPressed(uint8_t button_mask);
+uint8_t isButtonDown( uint8_t button_mask );
 
 // Make button pins inputs and activate internal pullups.
-void debounce_init(void);
+void debounceInit(void);
 
 // Decrease 2 bit vertical counter where mask = 1.
 // Set counters to binary 11 where mask = 0.
@@ -47,7 +52,7 @@ static inline void debounce(void){
 	static uint8_t vcount_low = 0xFF, vcount_high = 0xFF;
 
 	// Keeps track of current (debounced) state
-//	static uint8_t button_state = 0;
+	static uint8_t button_state = 0;
 
 	// Read buttons (active low so invert with ~). Xor with
 	// button_state to see which ones are about to change state
@@ -65,6 +70,9 @@ static inline void debounce(void){
 	// Update button_down with buttons who�s counters rolled over
 	// and who�s state is 1 (pressed)
 	buttons_down |= button_state & state_changed;
+
+	// Save current state in a separate variable to allow safe reading
+	buttons_down_state = button_state;
 }
 
 #endif

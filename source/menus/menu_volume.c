@@ -7,9 +7,10 @@
 
 #include "../menus.h"
 #include "menu_volume.h"
+#include "../button_debounce/buttons.h"
 
 void handleMenuVolume(){
-	if( buttonState() == PRESS ){
+	if( getButtonState() == PRESS ){
 		gotoMenu( menu_sound_settings );
 	}
 }

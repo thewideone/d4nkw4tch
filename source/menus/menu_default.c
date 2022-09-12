@@ -21,6 +21,6 @@ void handleMenuDefault( datetime_t * dt, uint8_t wake_up_time, uint8_t stay_up_t
 	ssd1306_put_int( 85, 43, (stay_up_time - time_spent_in_menu), 1, 1, 0 );
 
 	if( time_spent_in_menu == stay_up_time
-		|| buttonState() == PRESS)
+		|| getButtonState() == PRESS)
 		gotoMenu( menu_main );
 }

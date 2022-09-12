@@ -13,3 +13,5 @@ void uart_init( unsigned int baud );
 unsigned char rx_char();
 void tx_char( unsigned char c );
 void tx_string( char string[]);
+void tx_uint8( uint8_t num );
+void tx_uint8Bin( uint8_t num );

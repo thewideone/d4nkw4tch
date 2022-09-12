@@ -30,8 +30,10 @@ void handleMenuSetDateTime( void ){
 	//ssd1306_drawBitmap_P(119, menu_arrow_pos_y, arrow_on_left, ARROW_BMP_WIDTH, ARROW_BMP_HEIGHT, 1, 0);
 	draw_menu_arrow(119, menu_arrow_anim_dir, 11);
 
+	button_t button_state = getButtonState();
+
 	if( menu_cursor_x == 0 ){	// DEFAULT ( user's not changing any value )
-		switch (button) {
+		switch (button_state) {
 			case BOT:
 				//menu_cursor_y--;
 				//moveArrowCursorInv(-1);
@@ -54,7 +56,7 @@ void handleMenuSetDateTime( void ){
 		}
 	}
 
-	if( buttonState() == PRESS ){
+	if( button_state == PRESS ){
 		switch( menu_cursor_y ){
 			case 5:
 				gotoMenu( menu_apps );	// go back
@@ -84,7 +86,7 @@ void handleMenuSetDateTime( void ){
 			switch (menu_cursor_x) {	// CHANGING DAY OF WEEK
 				case 1:
 					ssd1306_puts(40, 40, days[temp_day_of_week], 1, 0, 1);
-					switch (button) {
+					switch (button_state) {
 						case BOT:
 							temp_day_of_week--;
 							if (temp_day_of_week == 255)
@@ -104,10 +106,13 @@ void handleMenuSetDateTime( void ){
 			}
 			break;
 		case 3://2:		// pointing on DATE
+			if( menu_cursor_x )
+				updateButtonsHoldModeDelayed( 1 );
+
 			switch (menu_cursor_x) {	// CHANGING DATE
 				case 1:
 					drawDateToSet(1, 0, 1, 0, 0, 1);
-					switch (button) {
+					switch (button_state) {
 						case BOT:
 							temp_year--;
 							break;
@@ -118,7 +123,7 @@ void handleMenuSetDateTime( void ){
 					break;
 				case 2:
 					drawDateToSet(1, 0, 0, 1, 1, 0);
-					switch (button) {
+					switch (button_state) {
 						case BOT:
 							temp_month--;
 							if (temp_month == 0)
@@ -133,7 +138,7 @@ void handleMenuSetDateTime( void ){
 					break;
 				case 3:
 					drawDateToSet(0, 1, 1, 0, 1, 0);
-					switch (button) {
+					switch (button_state) {
 						case BOT:
 							temp_day--;
 							if (temp_day == 0)
@@ -153,10 +158,12 @@ void handleMenuSetDateTime( void ){
 			}
 			break;
 		case 2://3:		// pointing on TIME
+			if( menu_cursor_x )
+				updateButtonsHoldModeDelayed( 1 );
 			switch (menu_cursor_x) {	// CHANGING TIME
 				case 1:
 					drawTimeToSet(1, 0, 1, 0, 0, 1);
-					switch (button) {
+					switch (button_state) {
 						case BOT:
 							temp_ss--;
 							if (temp_ss == 0)
@@ -171,7 +178,7 @@ void handleMenuSetDateTime( void ){
 					break;
 				case 2:
 					drawTimeToSet(1, 0, 0, 1, 1, 0);
-					switch (button) {
+					switch (button_state) {
 						case BOT:
 							temp_mm--;
 							if (temp_mm == 0)
@@ -186,7 +193,7 @@ void handleMenuSetDateTime( void ){
 					break;
 				case 3:
 					drawTimeToSet(0, 1, 1, 0, 1, 0);
-					switch (button) {
+					switch (button_state) {
 						case BOT:
 							temp_hh--;
 							if (temp_hh == 255)

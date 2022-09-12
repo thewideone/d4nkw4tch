@@ -18,6 +18,7 @@
 #include "../button_debounce/buttons.h"
 #include "../menus.h"
 
+void show_time( datetime_t * dt );
 
 void handleMenuMain( datetime_t * dt ){
 	show_time( dt );
@@ -73,7 +74,7 @@ void handleMenuMainAstronauts( datetime_t * dt ){
 //		ssd1306_put_int( 66, 42, (int)(dt->dayofweek), 1, 1, 0 );
 		ssd1306_put_int( 66, 42, dt->dayofweek, 1, 1, 0 );
 //		ssd1306_puts( 89, 31, temp->temperature, 1, 1, 0 );
-		ssd1306_puts( 102, 31, "*C", 1, 1, 0 );
+//		ssd1306_puts( 102, 31, "*C", 1, 1, 0 );
 
 //		ssd1306_drawFillRect( 89, 18, 2, 2, 1 );
 //		ssd1306_drawFillRect( 89, 22, 2, 2, 1 );
