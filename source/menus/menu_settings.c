@@ -49,9 +49,14 @@ void handleMenuSettings( uint8_t * bit_settings ){
 					*bit_settings ^= (1 << ASTRONAUT_MENU_BIT);
 					updateBitSettings(*bit_settings);
 					sei();
+
+					if( bit_is_set( *bit_settings, ASTRONAUT_MENU_BIT ) )
+						ssd1306_puts( 97, 44, "on ", 1, 1, 0 );
+					else
+						ssd1306_puts( 97, 44, "off", 1, 1, 0 );
 					break;
 				case 4:
-					gotoMenu( menu_main );
+					gotoMenu( menu_apps );
 					break;
 			}
 			break;

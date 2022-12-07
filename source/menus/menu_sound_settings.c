@@ -60,7 +60,7 @@ void handleMenuSoundSettings(void){
 					// reset cursors
 					//menu_cursor_y = 0;		// or maybe use globals?
 					//menu_cursor_x = 0;
-					gotoMenu( menu_apps );
+					gotoMenu( menu_settings );
 					break;
 			}
 			break;

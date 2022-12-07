@@ -29,26 +29,26 @@ extern volatile button_t button;		// defined in "buttons.c", declared here, 1-BO
 //extern uint8_t button_state;		// from "debounce.h"
 
 inline void handleButtons( void ){
-	switch( buttons_hold_mode ){
-		case 0:
-			if( isButtonJustPressed(BUTTON1_MASK) )
-				button = BOT;
-			else if( isButtonJustPressed(BUTTON3_MASK) )
-				button = TOP;
-			break;
-		case 1:
-			if( isButtonDown(BUTTON1_MASK) )
-				button = BOT;
-			else if( isButtonDown(BUTTON3_MASK) )
-				button = TOP;
-			break;
-	}
-//	if ( (buttons_hold_mode && isButtonDown(BUTTON1_MASK) ) || ( !buttons_hold_mode && isButtonJustPressed(BUTTON1_MASK) ) )
-//		button = BOT;
-//	else if ( (buttons_hold_mode && isButtonDown(BUTTON3_MASK) ) || ( !buttons_hold_mode && isButtonJustPressed(BUTTON3_MASK) ) )
-//		button = TOP;
-//	else if ( isButtonJustPressed(BUTTON2_MASK) )
-	if ( isButtonJustPressed(BUTTON2_MASK) )
+//	switch( buttons_hold_mode ){
+//		case 0:
+//			if( isButtonJustPressed(BUTTON1_MASK) )
+//				button = BOT;
+//			else if( isButtonJustPressed(BUTTON3_MASK) )
+//				button = TOP;
+//			break;
+//		case 1:
+//			if( isButtonDown(BUTTON1_MASK) )
+//				button = BOT;
+//			else if( isButtonDown(BUTTON3_MASK) )
+//				button = TOP;
+//			break;
+//	}
+	if ( (buttons_hold_mode && isButtonDown(BUTTON1_MASK) ) || ( !buttons_hold_mode && isButtonJustPressed(BUTTON1_MASK) ) )
+		button = BOT;
+	else if ( (buttons_hold_mode && isButtonDown(BUTTON3_MASK) ) || ( !buttons_hold_mode && isButtonJustPressed(BUTTON3_MASK) ) )
+		button = TOP;
+	else if ( isButtonJustPressed(BUTTON2_MASK) )
+//	if ( isButtonJustPressed(BUTTON2_MASK) )
 		button = PRESS;
 	else
 		button = NONE;

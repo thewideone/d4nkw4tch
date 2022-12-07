@@ -23,6 +23,8 @@ void gotoMenu( TMENU new_menu ){
 	menu_cursor_y = 0;
 	menu_cursor_x = 0;
 
+	uint8_t bit_settings = readBitSettings();
+
 	// Draw new menu:
 	switch( new_menu ){
 		case menu_main:
@@ -64,8 +66,15 @@ void gotoMenu( TMENU new_menu ){
 			ssd1306_puts( 7, 11, "Sound settings", 1, 1, 0 );
 			ssd1306_puts( 7, 22, "Invert display", 1, 1, 0 );
 			ssd1306_puts( 7, 33, "Power-saving mode", 1, 1, 0 );
-			ssd1306_puts( 7, 44, "Astronaut menu", 1, 1, 0 );
+			ssd1306_puts( 7, 44, "Astronaut menu:", 1, 1, 0 );
 			ssd1306_puts( 2, 55, "Back", 1, 1, 0 );
+
+			if( bit_is_set( bit_settings, ASTRONAUT_MENU_BIT ) )
+				ssd1306_puts( 97, 44, "on ", 1, 1, 0 );
+			else
+				ssd1306_puts( 97, 44, "off", 1, 1, 0 );
+
+			draw_menu_arrow(119, menu_arrow_anim_dir, 11);
 			break;
 		case menu_sound_settings:
 			menu_arrow_pos_y = 11;
@@ -75,7 +84,6 @@ void gotoMenu( TMENU new_menu ){
 			//ssd1306_puts( 2, 16, "OCR0B:", 1, 1, 0 );
 			ssd1306_puts( 2, 55, "Back", 1, 1, 0 );
 
-			uint8_t bit_settings = readBitSettings();
 			if( bit_is_set( bit_settings, BUTTON_SOUND_BIT ) ){
 				ssd1306_puts( 85, 23, "click", 1, 1, 0 );
 			}

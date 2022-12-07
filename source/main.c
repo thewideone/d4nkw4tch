@@ -53,6 +53,12 @@ struct small_int appCursor = {.var = 0};
 */
 /*
 	TODO:
+	- add watchface variable to select different watchfaces instead of astronaut bit in bit settings
+	- change battery level to smooth transition using drawing lines instead of bitmaps
+	- strzalka w menu lata w tybie ciaglym
+	- niech kropka w menu sie uspokoi XD
+	- przeniesc czytanie sqw do ISR
+	- wykrywanie Oscillator Fail Flag od RTC
 	- dodac wyswietlanie zera w tostring() w ssd1306_put_int()
 	- dzien tygodnia wychodzi poza days[][] w poniedzialki
 	- po obudzeniu obraz jest wyświetlany dopiero przy zmianie stanu rtc int - poprawić
@@ -127,6 +133,7 @@ int main(){
 	ssd1306_init( SSD1306_SWITCHCAPVCC, REFRESH_MAX );
 
 	setupADC();
+
 	// I/O SETUP
 	setupBattAndPlugSense();
 	setupLED();
@@ -137,18 +144,22 @@ int main(){
 
 	RTC_INT_DDR &= ~(1<<RTC_INT);		//
 	RTC_INT_PORT |= (1<<RTC_INT);		// enable pull-up
-	// end of I/O SETUP
 
 	// INTERRUPTS SETUP
 	PCICR |= (1 << PCIE1) | (1 << PCIE2);				// BUTTON & BATT STAT
 	PCMSK1 |= (1<<PCINT11) | (1<<PCINT10) | (1<<PCINT9);	// BUTTON
 	PCMSK2 |= (1<<PCINT20);//|(1<<PCINT19);	// BATT STAT
 
+	// RTC setup
 	BQ32002_init();
 	BQ32002_disableOsc();
 	BQ32002_enableOsc();
+	BQ32002_setCalSign(1);	// speed up the RTC
+	BQ32002_setCalValue(31);
 	BQ32002_setCalFreq( 1 );	// set 1Hz output
 	BQ32002_enableFreqTest();	// enable the output
+
+//	BQ32002_setDate( 22, 12, 7, 1 );
 
 	sei();
 
@@ -156,8 +167,11 @@ int main(){
 		/*	Sleep	*/
 		//tx_string("AT+SLEEP");
 		//BATT_EN_PORT &= ~(1<<BATT_EN);	// Disable the divider
+		BQ32002_disableFreqTest();	// disable the output
 		ssd1306_cmd( SSD1306_DISPLAYOFF );
-		//wdt_disable_mod();			// Disable Watchdog, so it won't reset MCU when it's asleep
+//		wdt_disable_mod();			// Disable Watchdog, so it won't reset MCU when it's asleep
+		WDTCSR = (1<<WDCE) | (1<<WDE);
+		WDTCSR = 0;
 		power_down;
 		sleep_enable;
 		sei();
@@ -165,7 +179,7 @@ int main(){
 		sleep_disable;
 
 		/* Wake up */
-		//wdt_enable(WDTO_4S);	// Enable Watchdog
+		wdt_enable(WDTO_2S);	// Enable Watchdog
 		ssd1306_init( SSD1306_SWITCHCAPVCC, REFRESH_MAX );
 		ssd1306_cmd( SSD1306_DISPLAYON );
 
@@ -182,7 +196,9 @@ int main(){
 		ssd1306_cls();
 		menu = menu_main;
 
+		BQ32002_enableFreqTest();	// enable the output
 		BQ32002_getDateTime( &datetime );
+
 		gotoMenu( menu_main );
 		wakeUpTime = datetime.ss;
 
@@ -205,11 +221,7 @@ int main(){
 					handleMenuDefault( &datetime, wakeUpTime, stayUpTime );
 					break;
 /* MAIN MENU */	case menu_main:
-//					getDateTime( &datetime );
-					if( bit_is_clear( bit_settings, ASTRONAUT_MENU_BIT ) )
-						handleMenuMain( &datetime );
-					else
-						handleMenuMainAstronauts( &datetime );
+					handleMenuMain( &datetime );
 					break;
 /* APP MENU */	case menu_apps:
 					handleMenuApps();
@@ -218,7 +230,6 @@ int main(){
 					if( getButtonState() == PRESS ){
 						LED_OFF;
 						LED2_OFF;
-						//ssd1306_invertDisplay(0);
 						handlePowerSettings( bit_settings );
 						gotoMenu( menu_apps );
 					}

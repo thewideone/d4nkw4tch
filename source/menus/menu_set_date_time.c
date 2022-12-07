@@ -52,7 +52,7 @@ void handleMenuSetDateTime( void ){
 			ssd1306_put_int_zeroes(40, 29, datetime.day, 2, 1, 1, 0);
 			ssd1306_put_int_zeroes(58, 29, datetime.month, 2, 1, 1, 0);
 			ssd1306_put_int_zeroes(76, 29, datetime.year, 2, 1, 1, 0);
-			ssd1306_puts(40, 40, days[datetime.dayofweek], 1, 1, 0);
+			ssd1306_puts(40, 40, days[ datetime.dayofweek - 1 ], 1, 1, 0);
 		}
 	}
 
@@ -85,17 +85,18 @@ void handleMenuSetDateTime( void ){
 		case 4://1:		// pointing on DAY OF WEEK
 			switch (menu_cursor_x) {	// CHANGING DAY OF WEEK
 				case 1:
-					ssd1306_puts(40, 40, days[temp_day_of_week], 1, 0, 1);
+					ssd1306_put_int( 40, 50, temp_day_of_week, 1, 1, 0 );
+					ssd1306_puts(40, 40, days[ temp_day_of_week - 1 ], 1, 0, 1);
 					switch (button_state) {
 						case BOT:
 							temp_day_of_week--;
-							if (temp_day_of_week == 255)
-								temp_day_of_week = 6;
+							if (temp_day_of_week == 0)
+								temp_day_of_week = 7;
 							break;
 						case TOP:
 							temp_day_of_week++;
-							if (temp_day_of_week == 7)
-								temp_day_of_week = 0;
+							if (temp_day_of_week == 8)
+								temp_day_of_week = 1;
 							break;
 					}
 					break;

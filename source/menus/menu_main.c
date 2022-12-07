@@ -18,48 +18,78 @@
 #include "../button_debounce/buttons.h"
 #include "../menus.h"
 
-void show_time( datetime_t * dt );
+void showTimeDefault( datetime_t * dt );
+void showTimeAstronauts( datetime_t * dt );
 
 void handleMenuMain( datetime_t * dt ){
-	show_time( dt );
+	uint8_t bit_settings = readBitSettings();
+
+	if( bit_is_clear( bit_settings, ASTRONAUT_MENU_BIT ) )
+		showTimeDefault( dt );
+	else
+		showTimeAstronauts( dt );
+
 	switch( button ){
 		case PRESS:
 			gotoMenu( menu_apps );
-			//gotoMenuApps();
 			break;
 	}
 }
 
-void handleMenuMainAstronauts( datetime_t * dt ){
+//
+// Draw bettery level indicator.
+// x, y  - coordinates of the start of the bitmap
+// level - 0-255 value of battery level
+//
+void drawBattLvlIndicator( int x, int y, uint8_t level ){
+	// Change to smooth transition using drawing lines
+	// to reduce number of bitmaps needed
+	if ( level>BATTERY_80 )
+		ssd1306_drawBitmap_P( x, y, batt_4, BATT_BMP_WIDTH, BATT_BMP_HEIGHT, 1, 0 );
+	else if ( level>BATTERY_60 )
+		ssd1306_drawBitmap_P( x, y, batt_3, BATT_BMP_WIDTH, BATT_BMP_HEIGHT, 1, 0 );
+	else if ( level>BATTERY_40 )
+		ssd1306_drawBitmap_P( x, y, batt_2, BATT_BMP_WIDTH, BATT_BMP_HEIGHT, 1, 0 );
+	else if ( level>BATTERY_20 )
+		ssd1306_drawBitmap_P( x, y, batt_1, BATT_BMP_WIDTH, BATT_BMP_HEIGHT, 1, 0 );
+	else
+		ssd1306_drawBitmap_P( x, y, batt_0, BATT_BMP_WIDTH, BATT_BMP_HEIGHT, 1, 0 );
+}
+
+//
+// Draw bettery charging indicator.
+// x, y  - coordinates of the start of the bitmap
+//
+void drawChargingIndicator( int x, int y ){
+	if ( isCharging() )
+		ssd1306_drawBitmap_P( x, y, chrg, CHRG_BMP_WIDTH, CHRG_BMP_HEIGHT, 1, 0 );
+	else
+		ssd1306_drawFillRect( x, y, CHRG_BMP_WIDTH, CHRG_BMP_HEIGHT, 0 );
+}
+
+//
+// Draw 'USB plugged' indicator.
+// x, y  - coordinates of the start of the bitmap
+//
+void drawUSBIndicator( int x, int y ){
+	if ( isUSBPlugged() )
+		ssd1306_drawBitmap_P( x, y, usb, USB_BMP_WIDTH, USB_BMP_HEIGHT, 1, 0 );
+	else
+		ssd1306_drawFillRect( x, y, USB_BMP_WIDTH, USB_BMP_HEIGHT, 0 );
+}
+
+void showTimeAstronauts( datetime_t * dt ){
 	if( sqwStateChanged() ){
 		readVcc();
 		uint8_t batt_lvl = batteryLvl();
-//		ssd1306_put_int( 5, 46, batt_lvl, 1, 1, 0 );
 
-//		ssd1306_put_int( 30, 46, charging, 1, 1, 0 );
+		// Maybe move these VV to some ISR?
+		drawBattLvlIndicator( 27, 57, batt_lvl );
+		drawChargingIndicator( 34, 41 );
+		drawUSBIndicator( 27, 49 );
 
-		// Maybe move this VV to some ISR?
-		if (isCharging())
-			ssd1306_drawBitmap_P( 34, 57, chrg, CHRG_BMP_WIDTH, CHRG_BMP_HEIGHT, 1, 0 );
-		else
-			ssd1306_drawFillRect( 34, 57, CHRG_BMP_WIDTH, CHRG_BMP_HEIGHT, 0 );
-		if (batt_lvl>BATTERY_80)
-			ssd1306_drawBitmap_P( 27, 57, batt_4, BATT_BMP_WIDTH, BATT_BMP_HEIGHT, 1, 0 );
-		else if (batt_lvl>BATTERY_60)
-			ssd1306_drawBitmap_P( 27, 57, batt_3, BATT_BMP_WIDTH, BATT_BMP_HEIGHT, 1, 0 );
-		else if (batt_lvl>BATTERY_40)
-			ssd1306_drawBitmap_P( 27, 57, batt_2, BATT_BMP_WIDTH, BATT_BMP_HEIGHT, 1, 0 );
-		else if (batt_lvl>BATTERY_20)
-			ssd1306_drawBitmap_P( 27, 57, batt_1, BATT_BMP_WIDTH, BATT_BMP_HEIGHT, 1, 0 );
-		else // if (batt_lvl<21)
-			ssd1306_drawBitmap_P( 27, 57, batt_0, BATT_BMP_WIDTH, BATT_BMP_HEIGHT, 1, 0 );
-		if (isUSBPlugged())
-			ssd1306_drawBitmap_P( 27, 49, usb, USB_BMP_WIDTH, USB_BMP_HEIGHT, 1, 0 );
-		else
-			ssd1306_drawFillRect( 27, 49, USB_BMP_WIDTH, USB_BMP_HEIGHT, 0 );
 
 		ssd1306_puts( 80, 2, dt->date, 1, 1, 0 );
-//		ssd1306_puts( 16, 17, dt->time, 2, 1, 0 ); // x=16,y=17
 		ssd1306_drawChar( 66, 14, dt->time[0], 1, 0, 2 );
 		ssd1306_drawChar( 78, 14, dt->time[1], 1, 0, 2 );
 		ssd1306_drawChar( 93, 14, dt->time[3], 1, 0, 2 );
@@ -70,89 +100,56 @@ void handleMenuMainAstronauts( datetime_t * dt ){
 		ssd1306_drawChar( 122, 21, dt->time[7], 1, 0, 1 );
 //		ssd1306_put_int( 116, 21, dt->ss, 1, 1, 0 );
 
-		ssd1306_puts( 66, 31, days[dt->dayofweek], 1, 1, 0 );
+		// RTC counts days of week from 1 to 7!
+		ssd1306_puts( 66, 31, days[ dt->dayofweek - 1 ], 1, 1, 0 );
 //		ssd1306_put_int( 66, 42, (int)(dt->dayofweek), 1, 1, 0 );
-		ssd1306_put_int( 66, 42, dt->dayofweek, 1, 1, 0 );
+//		ssd1306_put_int( 66, 42, dt->dayofweek, 1, 1, 0 );
 //		ssd1306_puts( 89, 31, temp->temperature, 1, 1, 0 );
 //		ssd1306_puts( 102, 31, "*C", 1, 1, 0 );
 
 //		ssd1306_drawFillRect( 89, 18, 2, 2, 1 );
 //		ssd1306_drawFillRect( 89, 22, 2, 2, 1 );
 	}
-
-	switch( button ){
-		case PRESS:
-			gotoMenu( menu_apps );
-			break;
-	}
 }
 
 /* DISPLAY DATE AND TIME */
-void show_time( datetime_t * dt ){
+void showTimeDefault( datetime_t * dt ){
 	// 3.69V -> 0.97-0.98V -> reading: 161-162
 
-	if( sqwState() )
-		ssd1306_drawFillRect( 2, 2, 2, 2, 1 );
-	else
-		ssd1306_drawFillRect( 2, 2, 2, 2, 0 );
-
+	// Update frame every 0.5s
 	if( sqwStateChanged() ){
+
+		if( sqwState() )
+			ssd1306_drawFillRect( 2, 2, 2, 2, 1 );
+		else
+			ssd1306_drawFillRect( 2, 2, 2, 2, 0 );
+
 		uint8_t batt_lvl;
 		uint8_t charging = isCharging();
 		ssd1306_drawFillRect( 2, 2, 2, 2, 1 );
 		readVcc();
-		batt_lvl = batteryLvl();//readVcc();//readBattLvl();
-		//char buf[4];
-		//long_to_string( lvl, batt_lvl, 4);
-		//uint16_t_to_string( buf, batt_lvl, 4);
-		//ssd1306_puts( 5, 48, buf, 1, 1, 0 );
+		batt_lvl = batteryLvl();
 		ssd1306_put_int( 5, 46, batt_lvl, 1, 1, 0 );
 
 		ssd1306_put_int( 30, 46, charging, 1, 1, 0 );
-		//char floatBuf[5];
-		//float Vbatt = batt_lvl*1.1*(102)/(27621);
-		//int Vbatt = batt_lvl*1.1*(102)/(27621)*100;
-		//volatile uint16_t Vbatt = 12345;//(uint16_t)(batt_lvl*0.406);
-		//gcvt( Vbatt, 4, buf );
-		//ftoa_my( Vbatt, floatBuf, 2 );
-		//float_to_string( floatBuf, 12345 );
-		//ssd1306_put_float( 5, 36, (uint16_t)(batt_lvl*0.406), 1, 1, 0 );
-		//ssd1306_put_float( 5, 36, 365, 1, 1, 0 );
-		//ssd1306_puts( 5, 36, floatBuf, 1, 1, 0 );
-		//volatile uint8_t n = 123;
-		//ssd1306_put_int( 5, 36, n, 1, 1, 0 );
 
-		// Maybe move this VV to some ISR?
-		if (isCharging())
-			ssd1306_drawBitmap_P( 33, 55, chrg, CHRG_BMP_WIDTH, CHRG_BMP_HEIGHT, 1, 0 );
-		else
-			ssd1306_drawFillRect( 17, 55, CHRG_BMP_WIDTH, CHRG_BMP_HEIGHT, 0 );
-		if (batt_lvl>BATTERY_80)
-			ssd1306_drawBitmap_P( 2, 55, batt_4, BATT_BMP_WIDTH, BATT_BMP_HEIGHT, 1, 0 );
-		else if (batt_lvl>BATTERY_60)
-			ssd1306_drawBitmap_P( 2, 55, batt_3, BATT_BMP_WIDTH, BATT_BMP_HEIGHT, 1, 0 );
-		else if (batt_lvl>BATTERY_40)
-			ssd1306_drawBitmap_P( 2, 55, batt_2, BATT_BMP_WIDTH, BATT_BMP_HEIGHT, 1, 0 );
-		else if (batt_lvl>BATTERY_20)
-			ssd1306_drawBitmap_P( 2, 55, batt_1, BATT_BMP_WIDTH, BATT_BMP_HEIGHT, 1, 0 );
-		else // if (batt_lvl<21)
-			ssd1306_drawBitmap_P( 2, 55, batt_0, BATT_BMP_WIDTH, BATT_BMP_HEIGHT, 1, 0 );
-		if (isUSBPlugged())
-			ssd1306_drawBitmap_P( 15, 55, usb, USB_BMP_WIDTH, USB_BMP_HEIGHT, 1, 0 );
-		else
-			ssd1306_drawFillRect( 15, 55, USB_BMP_WIDTH, USB_BMP_HEIGHT, 0 );
+		// Maybe move these VV to some ISR?
+		drawBattLvlIndicator( 2, 55, batt_lvl );
+		drawChargingIndicator( 33, 55 );
+		drawUSBIndicator( 15, 55 );
+
 		ssd1306_puts( 40, 2, dt->date, 1, 1, 0 );
 
 		ssd1306_puts( 16, 17, dt->time, 2, 1, 0 ); // x=16,y=17
-		ssd1306_puts( 55, 39, days[dt->dayofweek], 1, 1, 0 );
+		// RTC counts days of week from 1 to 7!
+		ssd1306_puts( 55, 39, days[ dt->dayofweek - 1 ], 1, 1, 0 );
 //		ssd1306_put_int( 35, 39, (int)(dt->dayofweek), 1, 1, 0 );
 		ssd1306_put_int( 35, 39, dt->dayofweek, 1, 1, 0 );
-	/*
-		if (gotMsg)
-			ssd1306_drawChar(98,56,'M',1,0,1);
-		else
-			ssd1306_drawChar(98,56,' ',1,0,1);
-	*/
+
+//		if (gotMsg)
+//			ssd1306_drawChar(98,56,'M',1,0,1);
+//		else
+//			ssd1306_drawChar(98,56,' ',1,0,1);
 
 		// Binary clock:
 		for(uint8_t i=0;i<8;i++){
@@ -161,6 +158,6 @@ void show_time( datetime_t * dt ){
 			ssd1306_setPixel(i+10,5,(datetime.hh>>i)&1);
 		}
 	}
-	else
-		ssd1306_drawFillRect( 2, 2, 2, 2, 0 );
+//	else
+//		ssd1306_drawFillRect( 2, 2, 2, 2, 0 );
 }
