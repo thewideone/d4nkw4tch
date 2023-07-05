@@ -28,6 +28,16 @@ uint8_t battery_lvl;// = BATTERY_80;
  * Its range is ~(0.874V - 1.112V) for ~(3.3V - 4.2V) battery,
  * so reading should be @ 10 bits (uint16_t) ~(812 - 1023)
  * and is @ 8 bits (uint8_t) ~( <=93 @ 3.3V - 255 @ 4.0V )
+ *
+ * batt_lvl = 226 @ 3.6V
+ *
+ * 4.2V 1.112
+ * 3.83V 1.014
+ * 3.7V 0.979
+ * 3.6V 0.953
+ * 3.5V 0.926
+ * 3.4V 0.9
+ * 3.3V 0.874
  */
 void readVcc( void ) {
 	//uint8_t result;
@@ -53,6 +63,8 @@ void readVcc( void ) {
 	battery_lvl = ADCH;
 //	battery_lvl = ADCL;
 //	battery_lvl |= ADCH<<8;
+//	battery_lvl |= ADCL;
+//	battery_lvl = (uint8_t) ADC;
 //	battery_lvl = (uint8_t)result/4;
 	//ADCSRA |= _BV( ADIF );			// but it has to be reset manually (unless we're handling an interrupt)
 

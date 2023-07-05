@@ -66,7 +66,11 @@ inline void setupBattAndPlugSense( void ){
 	//CHRG_MODE_PORT |= (1<<CHRG_MODE);	// High current default, turn to 0 to select low current charging
 	CHRG_STAT_DDR &= ~(1<<CHRG_STAT);	// BATT STAT
 	CHRG_STAT_PORT |= (1<<CHRG_STAT);	// Enable pull-up
+
+	// USB plug sense is at INT1 (PD3) pin
 	USB_SENSE_DDR &= ~(1<<USB_SENSE);	// USB PLUG SENSE
+	EICRA |= (1<<ISC10);	// any level change will trigger INT1
+	EIMSK |= (1<<INT1);		// enable external interrupt request
 }
 
 

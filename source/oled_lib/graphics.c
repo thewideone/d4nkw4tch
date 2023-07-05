@@ -151,9 +151,14 @@ void ssd1306_puts( int x, int y, char * str, uint8_t txt_size, uint8_t color, ui
 
 	cursor_x = x; cursor_y = y;
 
-	while( *str ){
+	// Character counter to avoid writing
+	// garbage data in an infinite loop.
+	uint8_t char_cnt = 0;
+
+	while( *str || char_cnt <= SSD1306_STR_MAX_CHAR_CNT ){
 		ssd1306_drawChar( cursor_x, cursor_y, *str++, color, bg, txt_size );
 		cursor_x += txt_size*6; /* 6 - szerokosc znaku */
+		char_cnt++;
 	}
 }
 
@@ -170,11 +175,15 @@ void ssd1306_puts_P( int x, int y, const char * str, uint8_t txt_size, uint8_t c
 }
 
 void ssd1306_put_int( int x, int y, int data, uint8_t txt_size, uint8_t color, uint8_t bg ){
-	char buf[ SSD1306_PUT_INT_BUF_SIZE ];
-	tostring( buf, data );
-//	int_to_string( buf, data, number_of_numbers );
-//	ssd1306_puts( x, y, itoa(data,buf,10), txt_size, color, bg );
-	ssd1306_puts( x, y, buf, txt_size, color, bg );
+	if( data == 0 )
+		ssd1306_puts( x, y, "0\0", txt_size, color, bg );
+	else{
+		char buf[ SSD1306_PUT_INT_BUF_SIZE ];
+		tostring( buf, data );
+	//	int_to_string( buf, data, number_of_numbers );
+	//	ssd1306_puts( x, y, itoa(data,buf,10), txt_size, color, bg );
+		ssd1306_puts( x, y, buf, txt_size, color, bg );
+	}
 }
 
 void ssd1306_put_int_zeroes( int x, int y, int data, uint8_t number_of_zeroes, uint8_t txt_size, uint8_t color, uint8_t bg ){

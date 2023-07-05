@@ -135,7 +135,7 @@ int main(){
 	setupADC();
 
 	// I/O SETUP
-	setupBattAndPlugSense();
+	setupBattAndPlugSense();	// uses INT1 for USB plug sense
 	setupLED();
 	setupBuzzer();	// uses Timer0
 	setupButtons();	// uses Timer2
@@ -145,7 +145,7 @@ int main(){
 	RTC_INT_DDR &= ~(1<<RTC_INT);		//
 	RTC_INT_PORT |= (1<<RTC_INT);		// enable pull-up
 
-	// INTERRUPTS SETUP
+	// PIN CHANGE INTERRUPT SETUP
 	PCICR |= (1 << PCIE1) | (1 << PCIE2);				// BUTTON & BATT STAT
 	PCMSK1 |= (1<<PCINT11) | (1<<PCINT10) | (1<<PCINT9);	// BUTTON
 	PCMSK2 |= (1<<PCINT20);//|(1<<PCINT19);	// BATT STAT
@@ -160,6 +160,9 @@ int main(){
 	BQ32002_enableFreqTest();	// enable the output
 
 //	BQ32002_setDate( 22, 12, 7, 1 );
+
+//	BQ32002_getDateTime( &datetime );
+//	setLastChargingTime( &datetime );
 
 	sei();
 
@@ -182,6 +185,8 @@ int main(){
 		wdt_enable(WDTO_2S);	// Enable Watchdog
 		ssd1306_init( SSD1306_SWITCHCAPVCC, REFRESH_MAX );
 		ssd1306_cmd( SSD1306_DISPLAYON );
+
+//		setupADC();
 
 		bit_settings = readBitSettings();
 
@@ -275,4 +280,21 @@ ISR(PCINT1_vect){
 // which includes charger input
 ISR(PCINT2_vect){
 	wakeUpTime = datetime.ss;
+}
+
+// USB plug (PWR_SENSE) interrupt vector
+ISR(INT1_vect){
+	// Force time update
+	BQ32002_getDateTime( &datetime );
+	wakeUpTime = datetime.ss;
+
+	// Set last charging time
+	// for time battery level indicator.
+	static uint8_t last_pwr_sense;
+	if( isUSBPlugged() )
+		last_pwr_sense = 1;
+	if( isUSBPlugged() == 0 && last_pwr_sense == 1 ){
+		setLastChargingTime( &datetime );
+		last_pwr_sense = 0;
+	}
 }

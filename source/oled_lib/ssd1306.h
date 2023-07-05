@@ -89,6 +89,8 @@
 
 #define SSD1306_WIDTH	128
 
+#define SSD1306_STR_MAX_CHAR_CNT (SSD1306_WIDTH / FONT_WIDTH)
+
 /* ******************** END OF CONFIG ******************** */
 
 #if defined SSD1306_128_64
