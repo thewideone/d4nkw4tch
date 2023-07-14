@@ -155,9 +155,9 @@ void ssd1306_puts( int x, int y, char * str, uint8_t txt_size, uint8_t color, ui
 	// garbage data in an infinite loop.
 	uint8_t char_cnt = 0;
 
-	while( *str || char_cnt <= SSD1306_STR_MAX_CHAR_CNT ){
+	while( *str && char_cnt <= SSD1306_STR_MAX_CHAR_CNT ){
 		ssd1306_drawChar( cursor_x, cursor_y, *str++, color, bg, txt_size );
-		cursor_x += txt_size*6; /* 6 - szerokosc znaku */
+		cursor_x += txt_size*(FONT_WIDTH+FONT_SPACE_BETWEEN_CHARS);
 		char_cnt++;
 	}
 }
@@ -166,11 +166,15 @@ void ssd1306_puts_P( int x, int y, const char * str, uint8_t txt_size, uint8_t c
 
 	cursor_x = x; cursor_y = y;
 
+	// Character counter to avoid writing
+	// garbage data in an infinite loop.
+	uint8_t char_cnt = 0;
+
 	register char c;
-	while( *str ){
+	while( *str && char_cnt <= SSD1306_STR_MAX_CHAR_CNT ){
 		c = pgm_read_byte( str++ );
 		ssd1306_drawChar( cursor_x, cursor_y, c, color, bg, txt_size );
-		cursor_x += txt_size*6; /* 6 - szerokosc znaku */
+		cursor_x += txt_size*(FONT_WIDTH+FONT_SPACE_BETWEEN_CHARS);
 	}
 }
 

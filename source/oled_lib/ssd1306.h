@@ -3,8 +3,10 @@
 
 #include <stdint.h>
 
+// In pixels
 #define FONT_WIDTH 5
 #define FONT_HEIGHT 7
+#define FONT_SPACE_BETWEEN_CHARS 1
 
 /* ******************** CONFIG ******************** */
 
