@@ -39,7 +39,7 @@ void tostring_zeroes(char str[], uint16_t num, uint8_t len){
         num = num / 10;
         str[len - (i + 1)] = rem + '0';
     }
-    str[len] = '\0';
+    str[len-1] = '\0';
 }
 
 // Let's stay with drawing bitmaps for now, this algorithm is too complicated and big to speed up the program.

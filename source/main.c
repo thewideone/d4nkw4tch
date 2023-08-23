@@ -173,6 +173,7 @@ int main(){
 		BQ32002_disableFreqTest();	// disable the output
 		ssd1306_cmd( SSD1306_DISPLAYOFF );
 //		wdt_disable_mod();			// Disable Watchdog, so it won't reset MCU when it's asleep
+		wdt_reset();
 		WDTCSR = (1<<WDCE) | (1<<WDE);
 		WDTCSR = 0;
 		power_down;
@@ -201,6 +202,7 @@ int main(){
 		ssd1306_cls();
 		menu = menu_main;
 
+//		wdt_reset();
 		BQ32002_enableFreqTest();	// enable the output
 		BQ32002_getDateTime( &datetime );
 
