@@ -12,13 +12,33 @@
 // Added by Szymon Kajda, used by ssd1306_move()
 extern uint8_t ssd1306_buf[ SSD1306_BUF_SIZE ];
 
-void tostring(char str[], uint16_t num){
+//
+// Convert uint16_t into char[] buffer.
+//     str - output buffer
+//     num - input number
+// Store error message if not succeeded:
+//	   EL - length error
+// Return nothing.
+//
+void tostring( char str[], uint16_t num ){
     uint16_t i, rem, len = 0, n;
     n = num;
+
+    // Calculate the decimal length of the number
     while ( n != 0 ){
         len++;
         n /= 10;
     }
+
+    // Check for and handle possible error.
+    if( len >= SSD1306_PUT_INT_BUF_SIZE ){
+		str[0] = 'E';
+		str[1] = 'L';
+		str[2] = '\0';
+		return;
+	}
+
+    // Fill the buffer with digits
     for ( i = 0; i < len; i++ ){
         rem = num % 10;
         num = num / 10;
@@ -27,11 +47,27 @@ void tostring(char str[], uint16_t num){
     str[len] = '\0';
 }
 
-void tostring_zeroes(char str[], uint16_t num, uint8_t len){
-    uint16_t i, rem;
-    //n = num;
+//
+// Convert uint16_t into char[] buffer, filling empty digits with zeroes .
+//     str - output buffer
+//     num - input number
+//     len - final number of digits !including string terminator!
+// Store error message if not succeeded:
+//	   EL  - length error
+// Return nothing.
+//
+void tostring_zeroes( char str[], uint16_t num, uint8_t len ){
+	// Check for and handle possible error.
+	if( len >= SSD1306_PUT_INT_BUF_SIZE ){
+		str[0] = 'E';
+		str[1] = 'L';
+		str[2] = '\0';
+		return;
+	}
 
-    for( uint8_t z = 0; z<len; z++ )
+    uint16_t i, rem;
+
+    for( uint8_t z = 0; z < len; z++ )
     	str[z] = '0';
 
     for ( i = 0; i < len; i++ ){
@@ -39,7 +75,7 @@ void tostring_zeroes(char str[], uint16_t num, uint8_t len){
         num = num / 10;
         str[len - (i + 1)] = rem + '0';
     }
-    str[len-1] = '\0';
+    str[len] = '\0';
 }
 
 // Let's stay with drawing bitmaps for now, this algorithm is too complicated and big to speed up the program.
@@ -184,17 +220,13 @@ void ssd1306_put_int( int x, int y, int data, uint8_t txt_size, uint8_t color, u
 	else{
 		char buf[ SSD1306_PUT_INT_BUF_SIZE ];
 		tostring( buf, data );
-	//	int_to_string( buf, data, number_of_numbers );
-	//	ssd1306_puts( x, y, itoa(data,buf,10), txt_size, color, bg );
 		ssd1306_puts( x, y, buf, txt_size, color, bg );
 	}
 }
 
-void ssd1306_put_int_zeroes( int x, int y, int data, uint8_t number_of_zeroes, uint8_t txt_size, uint8_t color, uint8_t bg ){
+void ssd1306_put_int_zeroes( int x, int y, int data, uint8_t digit_cnt, uint8_t txt_size, uint8_t color, uint8_t bg ){
 	char buf[ SSD1306_PUT_INT_BUF_SIZE ];
-	tostring_zeroes( buf, data, number_of_zeroes );
-//	int_to_string( buf, data, number_of_numbers );
-//	ssd1306_puts( x, y, itoa(data,buf,10), txt_size, color, bg );
+	tostring_zeroes( buf, data, digit_cnt );	// +1 for string terminator ('\0')
 	ssd1306_puts( x, y, buf, txt_size, color, bg );
 }
 

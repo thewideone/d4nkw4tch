@@ -192,7 +192,7 @@ void ssd1306_puts( int x, int y, char * str, uint8_t txt_size, uint8_t color, ui
 void ssd1306_puts_P( int x, int y, const char * str, uint8_t txt_size, uint8_t color, uint8_t bg );
 // Added by Szymon Kajda
 void ssd1306_put_int( int x, int y, int data, uint8_t txt_size, uint8_t color, uint8_t bg );
-void ssd1306_put_int_zeroes( int x, int y, int data, uint8_t number_of_zeroes, uint8_t txt_size, uint8_t color, uint8_t bg );
+void ssd1306_put_int_zeroes( int x, int y, int data, uint8_t digit_cnt, uint8_t txt_size, uint8_t color, uint8_t bg );
 // "num" has to look like like: (float with 2 dec places)*100
 //void ssd1306_put_float( int x, int y, uint16_t num, uint8_t size, uint8_t color, uint8_t bg );
 // Not used, see comment for ssd1306_move() in "graphics.c"

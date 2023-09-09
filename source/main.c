@@ -164,6 +164,9 @@ int main(){
 //	BQ32002_getDateTime( &datetime );
 //	setLastChargingTime( &datetime );
 
+	// BT init
+	tx_string("AT+SLEEP");
+
 	sei();
 
 	while(1){
