@@ -167,9 +167,6 @@ int main(){
 	// BT init
 	tx_string("AT+SLEEP");
 
-	// 3D init
-	menu_3d_test_init_3d();
-
 	sei();
 
 	while(1){
@@ -265,9 +262,6 @@ int main(){
 					break;
 /*  MENU BT  */	case menu_bt:
 					handleMenuBt();
-					break;
-				case menu_3d_test:
-					handleMenu3dTest();
 					break;
 			}
 			ssd1306_display();

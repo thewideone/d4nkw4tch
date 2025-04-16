@@ -23,9 +23,6 @@ void handleMenuApps( void ){
 			/* GO TO APP */
 			//switch (appCursor) {
 			switch ( menu_cursor_y ){
-				case 0:
-					new_menu = menu_3d_test;
-					break;
 				case 1:
 					new_menu = menu_set_date_and_time;
 					//gotoMenuSetDateAndTime();
@@ -45,9 +42,6 @@ void handleMenuApps( void ){
 				case 5:
 					new_menu = menu_main;
 					//gotoMenuMain();
-					break;
-				default:
-					new_menu = menu_main;
 					break;
 			}
 			gotoMenu( new_menu );

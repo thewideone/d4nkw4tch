@@ -1,6 +1,3 @@
 [submodule "source/BQ32002_lib"]
 	path = source/BQ32002_lib
 	url = https://github.com/thewideone/BQ32002_lib.git
-[submodule "source/mcu_graphic_engine_3d"]
-	path = source/mcu_graphic_engine_3d
-	url = https://github.com/thewideone/mcu_graphic_engine_3d

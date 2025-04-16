@@ -28,9 +28,8 @@
 #include "menus/menu_apps.h"
 #include "menus/menu_default.h"
 #include "menus/menu_volume.h"
-#include "menus/menu_3d_test.h"
 
-typedef enum {menu_main, menu_apps, menu_settings, menu_sound_settings, menu_volume, menu_set_date_and_time, menu_flashlight, menu_bt, menu_bt_terminal, menu_3d_test} TMENU;
+typedef enum {menu_main, menu_apps, menu_settings, menu_sound_settings, menu_volume, menu_set_date_and_time, menu_flashlight, menu_bt, menu_bt_terminal} TMENU;
 
 extern volatile TMENU menu;// = menu_main in "menus.c"
 
