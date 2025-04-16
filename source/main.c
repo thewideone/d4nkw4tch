@@ -167,6 +167,9 @@ int main(){
 	// BT init
 	tx_string("AT+SLEEP");
 
+	// 3D init
+	menu_3d_test_init_3d();
+
 	sei();
 
 	while(1){
