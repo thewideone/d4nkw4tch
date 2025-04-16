@@ -144,11 +144,12 @@ uint8_t getChargerState( void ){
 	if( bit_is_set( CHRG_STAT_PIN, CHRG_STAT ) )
 		result2 = 1;
 
-	if( result1 != result2 )	// shutdown / no battery
-		return SHUTDOWN_NO_BATT;
+
 	if( !result1 && !result2 )	// preconditioning / charging
 		return CHARGING;
-	if( result1 && result2 )	// charge complete
+	else if( result1 && result2 )	// charge complete
 		return COMPLETE_STANDBY;
+	else //if( result1 != result2 )	// shutdown / no battery
+		return SHUTDOWN_NO_BATT;
 }
 
