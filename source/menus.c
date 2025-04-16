@@ -53,7 +53,7 @@ void gotoMenu( TMENU new_menu ){
 			}
 			break;
 		case menu_apps:
-			ssd1306_puts( 7, 0, "Game", 1, 1, 0 );
+			ssd1306_puts( 7, 0, "3D test", 1, 1, 0 );	// was "Game"
 			ssd1306_puts( 7, 11, "Set time & date", 1, 1, 0 );
 			ssd1306_puts( 7, 22, "Flashlight", 1, 1, 0 );
 			ssd1306_puts( 7, 33, "Settings", 1, 1, 0 );
@@ -131,6 +131,12 @@ void gotoMenu( TMENU new_menu ){
 			ssd1306_puts( 2, 55, "Back", 1, 1, 0 );
 
 			tx_string("AT");
+			break;
+		case menu_3d_test:
+			ssd1306_puts( 7, 0, "3D test", 1, 1, 0 );
+			break;
+		default:
+			// should not reach here but well... XD
 			break;
 	}
 }

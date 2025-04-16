@@ -13,4 +13,6 @@
 void handleMenuMain( datetime_t * dt );
 void handleMenuMainAstronauts( datetime_t * dt );
 
+void setLastChargingTime( datetime_t * dt );
+
 #endif /* _MENU_MAIN_H_ */

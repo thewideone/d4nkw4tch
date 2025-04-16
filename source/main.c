@@ -263,6 +263,9 @@ int main(){
 /*  MENU BT  */	case menu_bt:
 					handleMenuBt();
 					break;
+				case menu_3d_test:
+					handleMenu3dTest();
+					break;
 			}
 			ssd1306_display();
 			updateSqwState();
